@@ -1,0 +1,341 @@
+# AI-Based Health Risk Predictor - PranaPredict AI 
+
+**Frontend:** React (Vite)
+**Backend:** Node.js + Express + CORS
+**Database & Auth:** Supabase
+**LLM:** Hugging Face (Open Source Models)
+**Deployment:** Render (Backend) + Vercel (Frontend)
+
+---
+
+# 1️⃣ Exact Tech Stack Versions (Stable for 2026)
+
+## Backend
+
+* Node.js → v20 LTS
+* Express → ^4.19.2
+* CORS → ^2.8.5
+* dotenv → ^16.4.5
+* Supabase JS → ^2.43.0
+* Axios → ^1.7.2
+* Zod (validation) → ^3.23.8
+* Helmet (security) → ^7.1.0
+* Morgan (logging) → ^1.10.0
+
+---
+
+## Frontend
+
+* React → ^18.3
+* Vite → ^5
+* Axios → ^1.7
+* React Router → ^6.22
+* Supabase JS → ^2.43
+* Chart.js → ^4.4
+
+---
+
+# 2️⃣ Project Folder Structure
+
+## Root Structure
+
+```
+health-risk-predictor/
+│
+├── backend/
+│
+├── frontend/
+│
+└── README.md
+```
+
+---
+
+## Backend Folder Structure
+
+```
+backend/
+│
+├── src/
+│   ├── config/
+│   │   ├── supabaseClient.js
+│   │   └── hfClient.js
+│   │
+│   ├── controllers/
+│   │   ├── predictionController.js
+│   │   └── reportController.js
+│   │
+│   ├── services/
+│   │   ├── riskCalculator.js
+│   │   └── llmService.js
+│   │
+│   ├── routes/
+│   │   ├── predictionRoutes.js
+│   │   └── reportRoutes.js
+│   │
+│   ├── middlewares/
+│   │   ├── authMiddleware.js
+│   │   └── errorHandler.js
+│   │
+│   └── app.js
+│
+├── server.js
+├── package.json
+├── .env
+└── render.yaml
+```
+
+---
+
+## Frontend Folder Structure
+
+```
+frontend/
+│
+├── src/
+│   ├── api/
+│   │   └── api.js
+│   │
+│   ├── components/
+│   │   ├── HealthForm.jsx
+│   │   ├── RiskResult.jsx
+│   │   └── Navbar.jsx
+│   │
+│   ├── pages/
+│   │   ├── Login.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── History.jsx
+│   │   └── Report.jsx
+│   │
+│   ├── utils/
+│   │   └── bmiCalculator.js
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+│
+├── .env
+├── package.json
+└── vercel.json
+```
+
+---
+
+# 3️⃣ Hugging Face LLM Integration
+
+Use models like:
+
+* Hugging Face
+* Model examples:
+
+  * mistralai/Mistral-7B-Instruct
+  * meta-llama/Llama-3-8B-Instruct
+  * google/gemma-7b-it
+
+You will call Hugging Face Inference API.
+
+---
+
+## Backend Flow
+
+1. Receive health data
+2. Calculate risk score (rule-based system)
+3. Generate structured prompt
+4. Send to Hugging Face model
+5. Store response in Supabase
+6. Return JSON to frontend
+
+---
+
+# 4️⃣ Risk Calculation Logic (No ML Coding)
+
+Example scoring system:
+
+```
+BMI > 30 → +20 points
+BP > 140/90 → +25 points
+Cholesterol High → +20
+Smoking → +15
+Low Activity → +10
+Age > 50 → +10
+```
+
+Total score → Convert to 0–100 scale
+
+Risk Levels:
+
+* 0–30 → Low
+* 31–60 → Moderate
+* 61–100 → High
+
+This is acceptable and explainable in interviews.
+
+---
+
+# 5️⃣ Supabase Database Design
+
+## Table: health_reports
+
+| Column         | Type      |
+| -------------- | --------- |
+| id             | uuid      |
+| user_id        | uuid      |
+| age            | int       |
+| bmi            | float     |
+| blood_pressure | text      |
+| cholesterol    | text      |
+| smoking        | boolean   |
+| activity_level | text      |
+| risk_score     | float     |
+| risk_level     | text      |
+| llm_advice     | text      |
+| created_at     | timestamp |
+
+---
+
+# 6️⃣ Deployment Guide
+
+---
+
+# 🔹 Backend Deployment (Render)
+
+1. Push backend to GitHub
+2. Go to Render
+3. Create New Web Service
+4. Connect GitHub repo
+5. Set:
+
+* Runtime → Node
+* Build Command:
+
+  ```
+  npm install
+  ```
+* Start Command:
+
+  ```
+  node server.js
+  ```
+
+6. Add Environment Variables:
+
+```
+SUPABASE_URL
+SUPABASE_ANON_KEY
+HUGGINGFACE_API_KEY
+PORT=10000
+```
+
+7. Deploy
+
+Render will provide:
+
+```
+https://your-backend.onrender.com
+```
+
+---
+
+# 🔹 Frontend Deployment (Vercel)
+
+1. Push frontend folder to GitHub
+2. Go to Vercel
+3. Import project
+4. Set:
+
+Framework → Vite
+
+Build Command:
+
+```
+npm run build
+```
+
+Output Directory:
+
+```
+dist
+```
+
+Add Environment Variable:
+
+```
+VITE_BACKEND_URL=https://your-backend.onrender.com
+VITE_SUPABASE_URL=xxxx
+VITE_SUPABASE_ANON_KEY=xxxx
+```
+
+Deploy
+
+---
+
+# 7️⃣ CORS Setup in Backend
+
+In `app.js`:
+
+```
+app.use(cors({
+  origin: "https://your-frontend.vercel.app",
+  credentials: true
+}));
+```
+
+---
+
+# 8️⃣ Security Best Practices
+
+* Use Helmet middleware
+* Rate limit API
+* Validate inputs with Zod
+* Never expose HF API key in frontend
+* Use Supabase Row Level Security
+
+---
+
+# 9️⃣ Advanced Features (Highly Recommended)
+
+Add:
+
+* Risk trend chart (Chart.js)
+* PDF download (Node PDFKit)
+* Health chatbot mode (same HF model)
+* Admin dashboard (analytics)
+* Dark mode UI
+
+---
+
+# 🔟 Interview Explanation Strategy
+
+When asked:
+
+“I did not train ML models. I used a rule-based medical risk scoring system and integrated open-source LLMs via Hugging Face API. The focus was on scalable architecture, secure API design, and real-world deployment.”
+
+This is industry-standard thinking in 2026.
+
+---
+
+If you want next, I can provide:
+
+* Complete backend starter code structure
+* Hugging Face request example
+* Supabase SQL schema
+* Full 30-day development roadmap
+* Resume bullet points for this project
+
+
+
+
+
+
+
+## Abstract
+
+**Project Title: PranaPredict AI – An Ayurveda-Inspired AI Health Risk Prediction System**
+
+PranaPredict AI is a full-stack web application designed to assess an individual’s health risk using modern clinical parameters integrated with Ayurveda-inspired wellness interpretation. The system enables users to input key health indicators such as age, BMI, blood pressure, cholesterol levels, smoking habits, and physical activity. Using a structured rule-based risk scoring algorithm, the platform calculates a quantitative health risk score and classifies it into low, moderate, or high risk categories.
+
+The backend is developed using Node.js and Express, while the frontend is built with React (Vite). Supabase is utilized for authentication, database management, and secure storage of user health reports. Instead of developing custom machine learning models, the system integrates open-source large language models through the Hugging Face Inference API to generate personalized health explanations and lifestyle recommendations. These AI-generated insights align with preventive healthcare principles inspired by Ayurveda, focusing on balance, diet regulation, physical activity, and sustainable living practices.
+
+The application is deployed using Render for backend services and Vercel for frontend hosting to ensure scalability and accessibility. The architecture follows secure API design standards, including input validation, environment-based configuration, and role-based data protection.
+
+PranaPredict AI demonstrates practical AI integration, cloud-based deployment, structured database design, and secure full-stack development, offering a preventive healthcare technology solution that emphasizes wellness optimization rather than reactive treatment.
+
