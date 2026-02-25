@@ -3,61 +3,40 @@ import supabase from "../config/supabaseClient";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000",
-  timeout: 12000,
+  timeout: 30000,
 });
 
-const SESSION_TIMEOUT_MS = 8000;
+// ── Session tracking ────────────────────────────────────────────────
+// Keep a module-level reference so the axios interceptor can read the
+// token synchronously instead of racing with getSession().
 
-function withTimeout(promise, timeoutMs) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => {
-      setTimeout(() => reject(new Error("Session lookup timed out")), timeoutMs);
-    }),
-  ]);
-}
+let _currentSession = null;
 
-function getAccessTokenFromStorage() {
-  if (typeof window === "undefined" || !window.localStorage) return null;
+// 1. Hydrate from storage on module load
+supabase.auth.getSession().then(({ data: { session } }) => {
+  _currentSession = session;
+});
 
-  for (const key of Object.keys(window.localStorage)) {
-    if (!key.startsWith("sb-") || !key.endsWith("-auth-token")) continue;
+// 2. Stay in sync with every auth change (login, logout, token refresh)
+supabase.auth.onAuthStateChange((_event, session) => {
+  _currentSession = session;
+});
 
-    try {
-      const raw = window.localStorage.getItem(key);
-      if (!raw) continue;
-      const parsed = JSON.parse(raw);
-
-      const directToken = parsed?.access_token;
-      const sessionToken = parsed?.currentSession?.access_token;
-      const arrayToken = Array.isArray(parsed) ? parsed[0]?.access_token : null;
-
-      const token = directToken || sessionToken || arrayToken;
-      if (token) return token;
-    } catch {
-      // Ignore malformed localStorage values
-    }
-  }
-
-  return null;
-}
-
-// Attach Supabase auth token to every request
+// ── Request interceptor ─────────────────────────────────────────────
+// Prefer the synchronous cached session.  Fall back to an async
+// getSession() call only if the cache hasn't been populated yet (e.g.
+// the very first request fires before the auth listener has run).
 API.interceptors.request.use(async (config) => {
-  let accessToken = null;
-
-  try {
-    const { data: { session } } = await withTimeout(
-      supabase.auth.getSession(),
-      SESSION_TIMEOUT_MS
-    );
-    accessToken = session?.access_token || null;
-  } catch {
-    // Fallback to storage token if session lookup fails
-  }
+  let accessToken = _currentSession?.access_token || null;
 
   if (!accessToken) {
-    accessToken = getAccessTokenFromStorage();
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      _currentSession = session;
+      accessToken = session?.access_token || null;
+    } catch {
+      // Proceed without token
+    }
   }
 
   if (accessToken) {

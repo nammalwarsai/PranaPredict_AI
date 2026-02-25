@@ -15,14 +15,14 @@ CREATE TABLE IF NOT EXISTS profiles (
 CREATE TABLE IF NOT EXISTS health_reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  age INT NOT NULL,
-  bmi FLOAT NOT NULL,
+  age INT NOT NULL CHECK (age >= 1 AND age <= 120),
+  bmi FLOAT NOT NULL CHECK (bmi >= 10 AND bmi <= 80),
   blood_pressure TEXT,
-  cholesterol TEXT,
+  cholesterol TEXT CHECK (cholesterol IN ('normal', 'borderline', 'high')),
   smoking BOOLEAN DEFAULT FALSE,
-  activity_level TEXT,
-  risk_score FLOAT NOT NULL,
-  risk_level TEXT NOT NULL,
+  activity_level TEXT CHECK (activity_level IN ('low', 'moderate', 'high')),
+  risk_score FLOAT NOT NULL CHECK (risk_score >= 0 AND risk_score <= 100),
+  risk_level TEXT NOT NULL CHECK (risk_level IN ('Low', 'Moderate', 'High')),
   llm_advice TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -31,24 +31,29 @@ CREATE TABLE IF NOT EXISTS health_reports (
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE health_reports ENABLE ROW LEVEL SECURITY;
 
--- 4. RLS Policies for profiles
+-- 4. RLS Policies for profiles (idempotent: drop then create)
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
 CREATE POLICY "Users can view own profile"
   ON profiles FOR SELECT
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
 CREATE POLICY "Users can insert own profile"
   ON profiles FOR INSERT
   WITH CHECK (auth.uid() = id);
 
--- 5. RLS Policies for health_reports
+-- 5. RLS Policies for health_reports (idempotent: drop then create)
+DROP POLICY IF EXISTS "Users can view own reports" ON health_reports;
 CREATE POLICY "Users can view own reports"
   ON health_reports FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own reports" ON health_reports;
 CREATE POLICY "Users can insert own reports"
   ON health_reports FOR INSERT
   WITH CHECK (auth.uid() = user_id);

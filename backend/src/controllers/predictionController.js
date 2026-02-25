@@ -1,15 +1,32 @@
+const { z } = require("zod");
 const { calculateRiskScore } = require("../services/riskCalculator");
 const { generateHealthAdvice } = require("../services/llmService");
 const { createAuthClient } = require("../config/supabaseClient");
 
+// Strict input schema
+const predictSchema = z.object({
+  age: z.number().int().min(1).max(120),
+  bmi: z.number().min(10).max(80),
+  bloodPressure: z
+    .string()
+    .regex(/^\d{2,3}\/\d{2,3}$/, "Blood pressure must be in format 'systolic/diastolic' e.g. 120/80")
+    .optional()
+    .default("120/80"),
+  cholesterol: z.enum(["normal", "borderline", "high"]).optional().default("normal"),
+  smoking: z.boolean().optional().default(false),
+  activityLevel: z.enum(["low", "moderate", "high"]).optional().default("moderate"),
+});
+
 async function predict(req, res, next) {
   try {
-    const { age, bmi, bloodPressure, cholesterol, smoking, activityLevel } = req.body;
-
-    if (age === undefined || bmi === undefined) {
-      return res.status(400).json({ error: "Age and BMI are required fields" });
+    // Validate input
+    const parseResult = predictSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      const messages = parseResult.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`);
+      return res.status(400).json({ success: false, error: "Validation failed", details: messages });
     }
 
+    const { age, bmi, bloodPressure, cholesterol, smoking, activityLevel } = parseResult.data;
     const healthData = { age, bmi, bloodPressure, cholesterol, smoking, activityLevel };
 
     const riskResult = calculateRiskScore(healthData);
@@ -26,7 +43,7 @@ async function predict(req, res, next) {
         bmi,
         blood_pressure: bloodPressure,
         cholesterol,
-        smoking: smoking || false,
+        smoking,
         activity_level: activityLevel,
         risk_score: riskResult.score,
         risk_level: riskResult.level,
@@ -37,6 +54,10 @@ async function predict(req, res, next) {
 
     if (dbError) {
       console.error("DB insert error:", dbError.message);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to save health report. Please try again.",
+      });
     }
 
     res.json({

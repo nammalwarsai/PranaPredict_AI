@@ -1,13 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
 
-  const handleSignOut = () => {
-    signOut();
+  const handleSignOut = async () => {
+    await signOut();
     navigate("/login", { replace: true });
   };
 
@@ -27,6 +27,9 @@ function Navbar() {
             </Link>
             <Link to="/history" className={isActive("/history") ? "active" : ""}>
               History
+            </Link>
+            <Link to="/health-tips" className={isActive("/health-tips") ? "active" : ""}>
+              Health Tips
             </Link>
             <Link to="/profile" className={isActive("/profile") ? "active" : ""}>
               Profile

@@ -1,3 +1,5 @@
+import DOMPurify from "dompurify";
+
 function RiskResult({ result }) {
   if (!result) return null;
 
@@ -12,22 +14,27 @@ function RiskResult({ result }) {
     }
   };
 
-  // Convert basic markdown to HTML for LLM output
+  // Convert basic markdown to sanitized HTML for LLM output
   function renderAdvice(text) {
     if (!text) return null;
     const lines = text.split("\n").filter((l) => l.trim() !== "");
     return lines.map((line, i) => {
       // Bold: **text**
       const formatted = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      const clean = DOMPurify.sanitize(formatted, { ALLOWED_TAGS: ["strong", "em", "b", "i"] });
       // Numbered list items
       if (/^\d+\.\s/.test(line)) {
-        return <p key={i} className="advice-line advice-numbered" dangerouslySetInnerHTML={{ __html: formatted }} />;
+        return <p key={i} className="advice-line advice-numbered" dangerouslySetInnerHTML={{ __html: clean }} />;
       }
       // Bullet list items
       if (/^[-*]\s/.test(line)) {
-        return <p key={i} className="advice-line advice-bullet" dangerouslySetInnerHTML={{ __html: formatted.replace(/^[-*]\s/, "") }} />;
+        const bulletClean = DOMPurify.sanitize(
+          formatted.replace(/^[-*]\s/, ""),
+          { ALLOWED_TAGS: ["strong", "em", "b", "i"] }
+        );
+        return <p key={i} className="advice-line advice-bullet" dangerouslySetInnerHTML={{ __html: bulletClean }} />;
       }
-      return <p key={i} className="advice-line" dangerouslySetInnerHTML={{ __html: formatted }} />;
+      return <p key={i} className="advice-line" dangerouslySetInnerHTML={{ __html: clean }} />;
     });
   }
 

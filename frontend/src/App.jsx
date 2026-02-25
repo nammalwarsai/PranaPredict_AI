@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Report from "./pages/Report";
+import HealthTips from "./pages/HealthTips";
 import "./App.css";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
               <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+              <Route path="/health-tips" element={<ProtectedRoute><HealthTips /></ProtectedRoute>} />
             </Routes>
           </main>
         </div>

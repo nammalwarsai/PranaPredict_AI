@@ -13,9 +13,13 @@ function calculateRiskScore(healthData) {
 
   // Blood pressure scoring (systolic/diastolic)
   if (bloodPressure) {
-    const [systolic, diastolic] = bloodPressure.split("/").map(Number);
-    if (systolic > 140 || diastolic > 90) score += 25;
-    else if (systolic > 120 || diastolic > 80) score += 10;
+    const parts = bloodPressure.split("/").map(Number);
+    const systolic = parts[0];
+    const diastolic = parts[1];
+    if (!isNaN(systolic) && !isNaN(diastolic)) {
+      if (systolic > 140 || diastolic > 90) score += 25;
+      else if (systolic > 120 || diastolic > 80) score += 10;
+    }
   }
 
   // Cholesterol scoring

@@ -27,6 +27,6 @@ dist-ssr
 .DS_Store
 *.suo
 node_modules
-environtment variables
 
-.env        
+# Environment variables
+.env

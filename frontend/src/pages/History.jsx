@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getReports } from "../api/api";
 import { jsPDF } from "jspdf";
+import TrendCharts from "../components/TrendCharts";
 
 function History() {
   const [reports, setReports] = useState([]);
@@ -220,6 +221,8 @@ function History() {
           <p>No reports yet. Go to the Dashboard to create your first health assessment.</p>
         </div>
       ) : (
+        <>
+        {reports.length >= 2 && <TrendCharts reports={reports} />}
         <div className="reports-list">
           {reports.map((report) => (
             <div key={report.id} className="report-card">
@@ -275,6 +278,7 @@ function History() {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
   );

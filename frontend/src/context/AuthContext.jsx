@@ -1,7 +1,9 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import supabase from "../config/supabaseClient";
 
-const AuthContext = createContext(null);
+// Exported separately so the useAuth hook file can import it
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -201,7 +203,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const syncProfile = async () => {
+  const syncProfile = useCallback(async () => {
     if (!user) return { error: { message: "Not authenticated" } };
 
     const payload = {
@@ -233,7 +235,7 @@ export function AuthProvider({ children }) {
       setProfile((prev) => prev || { ...payload, created_at: user.created_at || new Date().toISOString() });
       return { data: null, error: err };
     }
-  };
+  }, [user]);
 
   const value = {
     user,
@@ -248,10 +250,4 @@ export function AuthProvider({ children }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
 }

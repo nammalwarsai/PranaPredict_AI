@@ -109,9 +109,13 @@ function getFallbackAdvice(healthData, riskResult) {
   else if (bmi > 25) tips.push("Your BMI is slightly elevated. Light dietary adjustments can help.");
 
   if (bloodPressure) {
-    const [sys] = bloodPressure.split("/").map(Number);
-    if (sys > 140) tips.push("Your blood pressure is high. Reduce sodium intake and manage stress.");
-    else if (sys > 120) tips.push("Monitor your blood pressure regularly and stay hydrated.");
+    const parts = bloodPressure.split("/").map(Number);
+    const sys = parts[0];
+    const dia = parts[1];
+    if (!isNaN(sys) && !isNaN(dia)) {
+      if (sys > 140 || dia > 90) tips.push("Your blood pressure is high. Reduce sodium intake and manage stress.");
+      else if (sys > 120 || dia > 80) tips.push("Monitor your blood pressure regularly and stay hydrated.");
+    }
   }
 
   if (cholesterol === "high") tips.push("Reduce saturated fats and include more fiber in your diet.");

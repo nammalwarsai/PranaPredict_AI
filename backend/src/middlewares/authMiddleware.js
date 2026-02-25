@@ -2,7 +2,7 @@ const supabase = require("../config/supabaseClient");
 
 // In-memory token cache: token -> { user, expiresAt }
 const tokenCache = new Map();
-const CACHE_TTL_MS = 60 * 1000; // 60 seconds
+const CACHE_TTL_MS = 15 * 1000; // 15 seconds — short to limit stale token exposure
 const AUTH_TIMEOUT_MS = 8000;
 
 function withTimeout(promise, timeoutMs) {
