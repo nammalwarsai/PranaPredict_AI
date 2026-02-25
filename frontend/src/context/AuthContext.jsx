@@ -206,15 +206,34 @@ export function AuthProvider({ children }) {
   const syncProfile = useCallback(async () => {
     if (!user) return { error: { message: "Not authenticated" } };
 
-    const payload = {
-      id: user.id,
-      email: user.email || "",
-      phone: user.user_metadata?.phone || null,
-      full_name: user.user_metadata?.full_name || null,
-      updated_at: new Date().toISOString(),
-    };
-
     try {
+      // First, try to fetch the existing profile
+      const { data: existingData, error: fetchError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error("syncProfile fetch error:", fetchError.message);
+        return { data: null, error: fetchError };
+      }
+
+      // If a profile already exists, do not overwrite it with potentially stale user_metadata.
+      if (existingData) {
+        setProfile(existingData);
+        return { data: existingData, error: null };
+      }
+
+      // Profile does not exist yet (e.g. initial login), safe to initialize using user_metadata.
+      const payload = {
+        id: user.id,
+        email: user.email || "",
+        phone: user.user_metadata?.phone || null,
+        full_name: user.user_metadata?.full_name || null,
+        updated_at: new Date().toISOString(),
+      };
+
       const { data, error } = await supabase
         .from("profiles")
         .upsert(payload, { onConflict: "id" })
@@ -222,7 +241,7 @@ export function AuthProvider({ children }) {
         .single();
 
       if (error) {
-        console.error("syncProfile error:", error.message);
+        console.error("syncProfile upsert error:", error.message);
         // Use local payload as fallback so the UI still shows data
         setProfile((prev) => prev || { ...payload, created_at: user.created_at || new Date().toISOString() });
         return { data: null, error };
@@ -232,7 +251,6 @@ export function AuthProvider({ children }) {
       return { data, error: null };
     } catch (err) {
       console.error("syncProfile failed:", err?.message || err);
-      setProfile((prev) => prev || { ...payload, created_at: user.created_at || new Date().toISOString() });
       return { data: null, error: err };
     }
   }, [user]);

@@ -25,13 +25,14 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
+        <span className="dashboard-header-icon">🩺</span>
         <h1>Health Risk Predictor</h1>
         <p>Enter your health data below to get an AI-powered risk assessment</p>
       </div>
 
       {error && <div className="error-message">{error}</div>}
 
-      <div className="dashboard-content">
+      <div className={`dashboard-content${result ? " dashboard-content--has-result" : ""}`}>
         <HealthForm onSubmit={handleSubmit} loading={loading} />
         <RiskResult result={result} />
       </div>
