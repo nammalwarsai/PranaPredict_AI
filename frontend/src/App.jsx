@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
@@ -17,21 +18,23 @@ function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
-        <div className="app">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-              <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-              <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
-              <Route path="/health-tips" element={<ProtectedRoute><HealthTips /></ProtectedRoute>} />
-            </Routes>
-          </main>
-        </div>
+        <ThemeProvider>
+          <div className="app">
+            <Navbar />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+                <Route path="/health-tips" element={<ProtectedRoute><HealthTips /></ProtectedRoute>} />
+              </Routes>
+            </main>
+          </div>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   );

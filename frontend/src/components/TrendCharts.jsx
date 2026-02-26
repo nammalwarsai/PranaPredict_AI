@@ -11,6 +11,7 @@ import {
   Filler,
 } from "chart.js";
 import { Line, Doughnut } from "react-chartjs-2";
+import { useTheme } from "../context/ThemeContext";
 
 ChartJS.register(
   CategoryScale,
@@ -24,6 +25,9 @@ ChartJS.register(
 );
 
 function TrendCharts({ reports }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const sorted = useMemo(
     () =>
       [...reports].sort(
@@ -47,7 +51,7 @@ function TrendCharts({ reports }) {
           label: "Risk Score",
           data: sorted.map((r) => r.risk_score),
           borderColor: "#2563eb",
-          backgroundColor: "rgba(37, 99, 235, 0.08)",
+          backgroundColor: isDark ? "rgba(59, 130, 246, 0.12)" : "rgba(37, 99, 235, 0.08)",
           pointBackgroundColor: sorted.map((r) => {
             if (r.risk_level === "High") return "#ef4444";
             if (r.risk_level === "Moderate") return "#f59e0b";
@@ -61,7 +65,7 @@ function TrendCharts({ reports }) {
         },
       ],
     };
-  }, [sorted]);
+  }, [sorted, isDark]);
 
   const lineOptions = {
     responsive: true,
@@ -69,7 +73,7 @@ function TrendCharts({ reports }) {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: "#1e293b",
+        backgroundColor: isDark ? "#334155" : "#1e293b",
         titleFont: { size: 13, weight: "bold" },
         bodyFont: { size: 12 },
         padding: 10,
@@ -86,11 +90,11 @@ function TrendCharts({ reports }) {
       y: {
         min: 0,
         max: 100,
-        ticks: { stepSize: 20, color: "#64748b", font: { size: 11 } },
-        grid: { color: "#f1f5f9" },
+        ticks: { stepSize: 20, color: isDark ? "#94a3b8" : "#64748b", font: { size: 11 } },
+        grid: { color: isDark ? "#334155" : "#f1f5f9" },
       },
       x: {
-        ticks: { color: "#64748b", font: { size: 11 } },
+        ticks: { color: isDark ? "#94a3b8" : "#64748b", font: { size: 11 } },
         grid: { display: false },
       },
     },
@@ -123,10 +127,16 @@ function TrendCharts({ reports }) {
     plugins: {
       legend: {
         position: "bottom",
-        labels: { padding: 16, usePointStyle: true, pointStyleWidth: 10, font: { size: 12 } },
+        labels: {
+          padding: 16,
+          usePointStyle: true,
+          pointStyleWidth: 10,
+          font: { size: 12 },
+          color: isDark ? "#e2e8f0" : undefined,
+        },
       },
       tooltip: {
-        backgroundColor: "#1e293b",
+        backgroundColor: isDark ? "#334155" : "#1e293b",
         padding: 10,
         cornerRadius: 8,
       },
@@ -136,8 +146,8 @@ function TrendCharts({ reports }) {
   const avgScore =
     reports.length > 0
       ? (reports.reduce((s, r) => s + r.risk_score, 0) / reports.length).toFixed(
-          1
-        )
+        1
+      )
       : "—";
 
   const latestScore = sorted.length > 0 ? sorted[sorted.length - 1].risk_score : "—";

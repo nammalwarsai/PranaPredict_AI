@@ -19,6 +19,154 @@
   --radius: 8px;
 }
 
+/* ============================
+   DARK MODE OVERRIDES
+   ============================ */
+[data-theme="dark"] {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #f87171;
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #e2e8f0;
+  --text-light: #94a3b8;
+  --border: #334155;
+}
+
+/* --- Navbar dark --- */
+[data-theme="dark"] .nav-signout:hover {
+  background: #3b1a1a;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* --- Auth error / success dark --- */
+[data-theme="dark"] .auth-error {
+  background: #3b1a1a;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .error-message {
+  background: linear-gradient(135deg, #3b1a1a 0%, #44181a 100%);
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .profile-success {
+  background: #14332a;
+  border-color: #166534;
+  color: #4ade80;
+}
+
+/* --- BMI display dark --- */
+[data-theme="dark"] .bmi-display {
+  background: linear-gradient(135deg, #0c2d48 0%, #0e3a5c 100%);
+  border-color: #1e6091;
+  color: #7dd3fc;
+}
+
+/* --- Risk result dark --- */
+[data-theme="dark"] .risk-score-card {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+}
+
+[data-theme="dark"] .risk-advice {
+  background: linear-gradient(135deg, #14332a 0%, #1a3c34 100%);
+  border-color: #166534;
+}
+
+[data-theme="dark"] .advice-content,
+[data-theme="dark"] .risk-advice p {
+  color: #86efac;
+}
+
+/* --- Health form h2 border gradient on dark --- */
+[data-theme="dark"] .health-form h2 {
+  background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(90deg, var(--primary), #8b5cf6) border-box;
+}
+
+/* --- Landing page dark --- */
+[data-theme="dark"] .hero-card-demo {
+  background: var(--card-bg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .how-it-works {
+  background: var(--card-bg);
+}
+
+[data-theme="dark"] .feature-icon--blue {
+  background: #172554;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .feature-icon--green {
+  background: #14332a;
+  color: #4ade80;
+}
+
+[data-theme="dark"] .feature-icon--purple {
+  background: #2e1065;
+  color: #a78bfa;
+}
+
+[data-theme="dark"] .feature-icon--orange {
+  background: #431407;
+  color: #fb923c;
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background: #e0f2fe;
+}
+
+/* --- Health Tips dark --- */
+[data-theme="dark"] .ht-disclaimer {
+  background: #422006;
+  border-color: #92400e;
+  color: #fbbf24;
+}
+
+/* --- Report card hover dark --- */
+[data-theme="dark"] .report-card:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .health-form:hover {
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
+}
+
+/* --- Theme toggle button --- */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--card-bg);
+  transform: rotate(15deg);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+}
+
+.theme-toggle svg {
+  transition: transform 0.3s ease;
+}
+
+
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background-color: var(--bg);
@@ -121,8 +269,15 @@ body {
 }
 
 @keyframes dashFadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dashboard-header {
@@ -140,7 +295,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%);
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -148,13 +303,20 @@ body {
   display: inline-block;
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
   animation: iconPulse 2.5s ease-in-out infinite;
 }
 
 @keyframes iconPulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .dashboard-header h1 {
@@ -224,11 +386,27 @@ body {
 }
 
 @keyframes shakeError {
-  0%, 100% { transform: translateX(0); }
-  20%      { transform: translateX(-6px); }
-  40%      { transform: translateX(6px); }
-  60%      { transform: translateX(-4px); }
-  80%      { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 /* === Health Form === */
@@ -252,7 +430,7 @@ body {
   padding-bottom: 0.85rem;
   border-bottom: 2px solid transparent;
   background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-              linear-gradient(90deg, var(--primary), #8b5cf6) border-box;
+    linear-gradient(90deg, var(--primary), #8b5cf6) border-box;
   border-bottom: 2px solid;
   border-image: linear-gradient(90deg, var(--primary), #8b5cf6) 1;
   color: var(--text);
@@ -321,8 +499,15 @@ body {
 }
 
 @keyframes bmiSlideIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .checkbox-group label {
@@ -368,7 +553,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15));
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.15));
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -403,8 +588,15 @@ body {
 }
 
 @keyframes resultSlideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .risk-result h2 {
@@ -422,8 +614,8 @@ body {
   border: 2px solid;
   border-radius: 16px;
   margin-bottom: 1.5rem;
-  background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(248,250,252,0.95));
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.95));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .risk-score-circle {
@@ -436,13 +628,20 @@ body {
   justify-content: center;
   margin: 0 auto 1rem;
   color: white;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   animation: scorePopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes scorePopIn {
-  from { transform: scale(0.5); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .score-number {
@@ -480,7 +679,7 @@ body {
   font-size: 0.9rem;
 }
 
-.details-grid > div {
+.details-grid>div {
   background: var(--bg);
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
@@ -837,6 +1036,7 @@ body {
 
 /* === Responsive === */
 @media (max-width: 480px) {
+
   .auth-card,
   .profile-card {
     padding: 1.5rem;
@@ -1072,15 +1272,30 @@ body {
   justify-content: center;
 }
 
-.feature-icon--blue  { background: #eff6ff; color: #2563eb; }
-.feature-icon--green { background: #f0fdf4; color: #16a34a; }
-.feature-icon--purple { background: #f5f3ff; color: #7c3aed; }
-.feature-icon--orange { background: #fff7ed; color: #ea580c; }
+.feature-icon--blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.feature-icon--green {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.feature-icon--purple {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.feature-icon--orange {
+  background: #fff7ed;
+  color: #ea580c;
+}
 
 /* How It Works */
 .how-it-works {
   padding: 5rem 2rem;
-  background: white;
+  background: var(--card-bg);
   text-align: center;
 }
 
@@ -1383,6 +1598,7 @@ body {
   -webkit-appearance: none;
   margin: 0;
 }
+
 .ht-age-input[type="number"] {
   -moz-appearance: textfield;
 }
