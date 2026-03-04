@@ -4,27 +4,24 @@ const HF_API_URL =
   process.env.HF_API_URL ||
   "https://router.huggingface.co/together/v1/chat/completions";
 
-const MODEL_CANDIDATES = [
-  process.env.HUGGINGFACE_MODEL,
-  "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-  "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-  "Qwen/Qwen2.5-7B-Instruct-Turbo",
-].filter(Boolean);
+const MODEL = process.env.HUGGINGFACE_MODEL || "Qwen/Qwen2.5-7B-Instruct-Turbo";
 
-const PRIMARY_MODEL = MODEL_CANDIDATES[0];
+let _client = null;
 
 function getClient() {
+  if (_client) return _client;
   const apiKey = process.env.HUGGINGFACE_API_KEY;
   if (!apiKey || apiKey === "your_huggingface_api_key_here") {
     return null;
   }
-  return axios.create({
+  _client = axios.create({
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     timeout: 60000,
   });
+  return _client;
 }
 
-module.exports = { getClient, PRIMARY_MODEL, MODEL_CANDIDATES, HF_API_URL };
+module.exports = { getClient, MODEL, HF_API_URL };

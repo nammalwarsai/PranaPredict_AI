@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from "react";
+import { createContext, useState, useEffect, useCallback, useMemo } from "react";
 import supabase from "../config/supabaseClient";
 
 // Exported separately so the useAuth hook file can import it
@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (authUser) => {
+  const fetchProfile = useCallback(async (authUser) => {
     const userId = typeof authUser === "string" ? authUser : authUser?.id;
     if (!userId) {
       setProfile(null);
@@ -18,9 +18,6 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      // Wait briefly so the Supabase client session is fully ready
-      await new Promise((r) => setTimeout(r, 100));
-
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -55,7 +52,6 @@ export function AuthProvider({ children }) {
 
         if (createError) {
           console.error("fetchProfile UPSERT error:", createError.message);
-          // Even if upsert fails, try to use the payload as a fallback
           setProfile({ ...payload, created_at: new Date().toISOString() });
           return;
         }
@@ -68,7 +64,7 @@ export function AuthProvider({ children }) {
       console.error("fetchProfile failed:", err?.message || err);
       setProfile(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -95,7 +91,6 @@ export function AuthProvider({ children }) {
         if (!mounted) return;
         const currentUser = session?.user ?? null;
         setUser(currentUser);
-        // Resolve loading immediately so the UI renders without waiting for profile
         if (mounted) setLoading(false);
         if (currentUser) {
           fetchProfile(currentUser);
@@ -129,9 +124,9 @@ export function AuthProvider({ children }) {
       clearTimeout(safetyTimer);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchProfile]);
 
-  const signUp = async (email, password, phone) => {
+  const signUp = useCallback(async (email, password, phone) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -140,22 +135,20 @@ export function AuthProvider({ children }) {
       },
     });
     return { data, error };
-  };
+  }, []);
 
-  const signIn = async (email, password) => {
+  const signIn = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     return { data, error };
-  };
+  }, []);
 
-  const signOut = async () => {
-    // Clear local auth state first for instant UI response
+  const signOut = useCallback(async () => {
     setUser(null);
     setProfile(null);
 
-    // Defensive cleanup for persisted Supabase auth keys
     if (typeof window !== "undefined" && window.localStorage) {
       Object.keys(window.localStorage).forEach((key) => {
         if (key.startsWith("sb-") && key.endsWith("-auth-token")) {
@@ -173,9 +166,9 @@ export function AuthProvider({ children }) {
     } catch (error) {
       return { error };
     }
-  };
+  }, []);
 
-  const updateProfile = async (updates) => {
+  const updateProfile = useCallback(async (updates) => {
     if (!user) return { error: { message: "Not authenticated" } };
     try {
       const { data, error } = await supabase
@@ -201,13 +194,12 @@ export function AuthProvider({ children }) {
       console.error("updateProfile failed:", err?.message || err);
       return { data: null, error: err };
     }
-  };
+  }, [user]);
 
   const syncProfile = useCallback(async () => {
     if (!user) return { error: { message: "Not authenticated" } };
 
     try {
-      // First, try to fetch the existing profile
       const { data: existingData, error: fetchError } = await supabase
         .from("profiles")
         .select("*")
@@ -219,13 +211,11 @@ export function AuthProvider({ children }) {
         return { data: null, error: fetchError };
       }
 
-      // If a profile already exists, do not overwrite it with potentially stale user_metadata.
       if (existingData) {
         setProfile(existingData);
         return { data: existingData, error: null };
       }
 
-      // Profile does not exist yet (e.g. initial login), safe to initialize using user_metadata.
       const payload = {
         id: user.id,
         email: user.email || "",
@@ -242,7 +232,6 @@ export function AuthProvider({ children }) {
 
       if (error) {
         console.error("syncProfile upsert error:", error.message);
-        // Use local payload as fallback so the UI still shows data
         setProfile((prev) => prev || { ...payload, created_at: user.created_at || new Date().toISOString() });
         return { data: null, error };
       }
@@ -255,7 +244,7 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     profile,
     loading,
@@ -265,7 +254,7 @@ export function AuthProvider({ children }) {
     updateProfile,
     syncProfile,
     fetchProfile,
-  };
+  }), [user, profile, loading, signUp, signIn, signOut, updateProfile, syncProfile, fetchProfile]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

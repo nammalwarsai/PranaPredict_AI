@@ -1,53 +1,54 @@
+import { useMemo, memo } from "react";
 import DOMPurify from "dompurify";
+
+const SANITIZE_OPTIONS = { ALLOWED_TAGS: ["strong", "em", "b", "i"] };
+
+function getRiskColor(level) {
+  switch (level) {
+    case "Low": return "#22c55e";
+    case "Moderate": return "#f59e0b";
+    case "High": return "#ef4444";
+    default: return "#6b7280";
+  }
+}
 
 function RiskResult({ result }) {
   if (!result) return null;
 
   const { riskScore, riskLevel, advice, healthData, model } = result;
 
-  const getRiskColor = (level) => {
-    switch (level) {
-      case "Low": return "#22c55e";
-      case "Moderate": return "#f59e0b";
-      case "High": return "#ef4444";
-      default: return "#6b7280";
-    }
-  };
-
-  // Convert basic markdown to sanitized HTML for LLM output
-  function renderAdvice(text) {
-    if (!text) return null;
-    const lines = text.split("\n").filter((l) => l.trim() !== "");
+  const renderedAdvice = useMemo(() => {
+    if (!advice) return null;
+    const lines = advice.split("\n").filter((l) => l.trim() !== "");
     return lines.map((line, i) => {
-      // Bold: **text**
       const formatted = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-      const clean = DOMPurify.sanitize(formatted, { ALLOWED_TAGS: ["strong", "em", "b", "i"] });
-      // Numbered list items
+      const clean = DOMPurify.sanitize(formatted, SANITIZE_OPTIONS);
       if (/^\d+\.\s/.test(line)) {
         return <p key={i} className="advice-line advice-numbered" dangerouslySetInnerHTML={{ __html: clean }} />;
       }
-      // Bullet list items
       if (/^[-*]\s/.test(line)) {
         const bulletClean = DOMPurify.sanitize(
           formatted.replace(/^[-*]\s/, ""),
-          { ALLOWED_TAGS: ["strong", "em", "b", "i"] }
+          SANITIZE_OPTIONS
         );
         return <p key={i} className="advice-line advice-bullet" dangerouslySetInnerHTML={{ __html: bulletClean }} />;
       }
       return <p key={i} className="advice-line" dangerouslySetInnerHTML={{ __html: clean }} />;
     });
-  }
+  }, [advice]);
+
+  const riskColor = getRiskColor(riskLevel);
 
   return (
     <div className="risk-result">
       <h2>Your Health Risk Assessment</h2>
 
-      <div className="risk-score-card" style={{ borderColor: getRiskColor(riskLevel) }}>
-        <div className="risk-score-circle" style={{ backgroundColor: getRiskColor(riskLevel) }}>
+      <div className="risk-score-card" style={{ borderColor: riskColor }}>
+        <div className="risk-score-circle" style={{ backgroundColor: riskColor }}>
           <span className="score-number">{riskScore}</span>
           <span className="score-label">/ 100</span>
         </div>
-        <div className="risk-level" style={{ color: getRiskColor(riskLevel) }}>
+        <div className="risk-level" style={{ color: riskColor }}>
           {riskLevel} Risk
         </div>
       </div>
@@ -72,11 +73,11 @@ function RiskResult({ result }) {
           )}
         </div>
         <div className="advice-content">
-          {renderAdvice(advice)}
+          {renderedAdvice}
         </div>
       </div>
     </div>
   );
 }
 
-export default RiskResult;
+export default memo(RiskResult);

@@ -67,7 +67,7 @@ function TrendCharts({ reports }) {
     };
   }, [sorted, isDark]);
 
-  const lineOptions = {
+  const lineOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -98,7 +98,7 @@ function TrendCharts({ reports }) {
         grid: { display: false },
       },
     },
-  };
+  }), [isDark, sorted]);
 
   const distribution = useMemo(() => {
     const counts = { Low: 0, Moderate: 0, High: 0 };
@@ -108,7 +108,7 @@ function TrendCharts({ reports }) {
     return counts;
   }, [reports]);
 
-  const doughnutData = {
+  const doughnutData = useMemo(() => ({
     labels: ["Low", "Moderate", "High"],
     datasets: [
       {
@@ -118,9 +118,9 @@ function TrendCharts({ reports }) {
         hoverOffset: 6,
       },
     ],
-  };
+  }), [distribution]);
 
-  const doughnutOptions = {
+  const doughnutOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     cutout: "65%",
@@ -141,14 +141,14 @@ function TrendCharts({ reports }) {
         cornerRadius: 8,
       },
     },
-  };
+  }), [isDark]);
 
-  const avgScore =
+  const avgScore = useMemo(() =>
     reports.length > 0
-      ? (reports.reduce((s, r) => s + r.risk_score, 0) / reports.length).toFixed(
-        1
-      )
-      : "—";
+      ? (reports.reduce((s, r) => s + r.risk_score, 0) / reports.length).toFixed(1)
+      : "—",
+    [reports]
+  );
 
   const latestScore = sorted.length > 0 ? sorted[sorted.length - 1].risk_score : "—";
 

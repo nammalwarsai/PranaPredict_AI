@@ -15,10 +15,17 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /**
  * Create an authenticated Supabase client that carries the user's JWT.
- * This ensures RLS policies (auth.uid()) work correctly on the backend.
+ * Cached per token so repeated calls within the same request (or short window)
+ * reuse the same instance instead of allocating a new one every time.
  */
+const _authClientCache = new Map();
+const AUTH_CLIENT_MAX = 200;
+
 function createAuthClient(accessToken) {
-  return createClient(
+  const cached = _authClientCache.get(accessToken);
+  if (cached) return cached;
+
+  const client = createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
     {
@@ -29,6 +36,16 @@ function createAuthClient(accessToken) {
       },
     }
   );
+
+  _authClientCache.set(accessToken, client);
+
+  // Prevent unbounded growth: evict oldest entry
+  if (_authClientCache.size > AUTH_CLIENT_MAX) {
+    const firstKey = _authClientCache.keys().next().value;
+    _authClientCache.delete(firstKey);
+  }
+
+  return client;
 }
 
 module.exports = supabase;

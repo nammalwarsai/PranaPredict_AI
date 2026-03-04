@@ -1,7 +1,6 @@
 const {
   getClient,
-  PRIMARY_MODEL,
-  MODEL_CANDIDATES,
+  MODEL,
   HF_API_URL,
 } = require("../config/hfClient");
 
@@ -32,9 +31,7 @@ Keep the response under 250 words. Be specific to their data, not generic.`;
 async function generateHealthAdvice(healthData, riskResult) {
   const client = getClient();
 
-  // Fallback if no API key configured
   if (!client) {
-    const { score, level } = riskResult;
     return {
       advice: getFallbackAdvice(healthData, riskResult),
       model: "fallback",
@@ -43,55 +40,37 @@ async function generateHealthAdvice(healthData, riskResult) {
 
   try {
     const prompt = buildPrompt(healthData, riskResult);
-    let lastError = null;
 
-    for (const model of MODEL_CANDIDATES) {
-      try {
-        const response = await client.post(HF_API_URL, {
-          model,
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          max_tokens: 512,
-          temperature: 0.6,
-          top_p: 0.95,
-        });
+    const response = await client.post(HF_API_URL, {
+      model: MODEL,
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      max_tokens: 512,
+      temperature: 0.6,
+      top_p: 0.95,
+    });
 
-        const content = response.data?.choices?.[0]?.message?.content;
+    const content = response.data?.choices?.[0]?.message?.content;
 
-        if (!content) {
-          throw new Error("Empty response from LLM");
-        }
-
-        return {
-          advice: content.trim(),
-          model,
-        };
-      } catch (error) {
-        lastError = error;
-        const reason = error?.response?.data?.reason;
-        const message = error?.response?.data?.message;
-        const isModelNotFound = reason === "MODEL_NOT_FOUND" || /model not found/i.test(message || "");
-
-        if (!isModelNotFound) {
-          throw error;
-        }
-      }
+    if (!content) {
+      throw new Error("Empty response from LLM");
     }
 
-    throw lastError || new Error("No available model accepted by the router");
+    return {
+      advice: content.trim(),
+      model: MODEL,
+    };
   } catch (error) {
     console.error("LLM API error:", {
       message: error?.response?.data?.message || error.message,
       reason: error?.response?.data?.reason,
-      triedModels: MODEL_CANDIDATES,
-      primaryModel: PRIMARY_MODEL,
+      model: MODEL,
     });
 
-    // Return fallback advice on error so the prediction still works
     return {
       advice: getFallbackAdvice(healthData, riskResult),
       model: "fallback",
