@@ -16,7 +16,11 @@
   --text: #1e293b;
   --text-light: #64748b;
   --border: #e2e8f0;
+  --surface-border: #dbe4f0;
   --radius: 8px;
+  --bg-gradient: radial-gradient(circle at 15% 20%, #dbeafe 0%, transparent 40%),
+    radial-gradient(circle at 85% 0%, #ede9fe 0%, transparent 35%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
 }
 
 /* ============================
@@ -33,6 +37,10 @@
   --text: #e2e8f0;
   --text-light: #94a3b8;
   --border: #334155;
+  --surface-border: #3b475c;
+  --bg-gradient: radial-gradient(circle at 20% 10%, rgba(37, 99, 235, 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(139, 92, 246, 0.18) 0%, transparent 35%),
+    linear-gradient(180deg, #0b1224 0%, #111827 100%);
 }
 
 /* --- Navbar dark --- */
@@ -169,7 +177,8 @@
 
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: var(--bg);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text);
   line-height: 1.6;
 }
@@ -185,7 +194,7 @@ body {
   max-width: 1100px;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.5rem;
   flex: 1;
 }
 
@@ -207,14 +216,21 @@ body {
 
 /* === Navbar === */
 .navbar {
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--surface-border);
   padding: 0 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 64px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+[data-theme="dark"] .navbar {
+  background: rgba(15, 23, 42, 0.94);
 }
 
 .navbar-brand a {
@@ -222,6 +238,7 @@ body {
   font-weight: 700;
   color: var(--primary);
   text-decoration: none;
+  letter-spacing: -0.02em;
 }
 
 .navbar-links {
@@ -236,7 +253,7 @@ body {
   font-weight: 500;
   padding: 0.5rem 0;
   border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  transition: all 0.25s;
 }
 
 .navbar-links a:hover,
@@ -285,7 +302,7 @@ body {
   margin-bottom: 2.5rem;
   padding: 2.5rem 1.5rem 2rem;
   background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #3b82f6 100%);
-  border-radius: 16px;
+  border-radius: 24px;
   color: white;
   position: relative;
   overflow: hidden;
@@ -412,15 +429,16 @@ body {
 /* === Health Form === */
 .health-form {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 34px rgba(30, 41, 59, 0.08);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .health-form:hover {
-  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 20px 42px rgba(37, 99, 235, 0.16);
+  transform: translateY(-3px);
 }
 
 .health-form h2 {
@@ -580,10 +598,10 @@ body {
 /* === Risk Result === */
 .risk-result {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 34px rgba(30, 41, 59, 0.08);
   animation: resultSlideIn 0.5s ease-out;
 }
 
@@ -757,12 +775,12 @@ body {
 
 .auth-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
   padding: 2.5rem;
   max-width: 420px;
   width: 100%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
 }
 
 .auth-card h1 {
@@ -852,11 +870,12 @@ body {
 
 .profile-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
   padding: 2.5rem;
   max-width: 500px;
   width: 100%;
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
 }
 
 .profile-card h1 {
@@ -932,14 +951,15 @@ body {
 
 .report-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
   padding: 1.25rem;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.25s, transform 0.25s;
 }
 
 .report-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
 }
 
 .report-card-header {
@@ -1061,7 +1081,7 @@ body {
 
 /* Hero */
 .hero {
-  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #0f2748 0%, #2563eb 45%, #4f46e5 100%);
   padding: 5rem 2rem 4rem;
   display: flex;
   align-items: center;
@@ -1163,12 +1183,13 @@ body {
 }
 
 .hero-card-demo {
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 20px;
   padding: 2rem;
   width: 220px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 .demo-score-ring {
@@ -1239,16 +1260,17 @@ body {
 
 .feature-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
   padding: 1.75rem 1.5rem;
   text-align: left;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: box-shadow 0.28s, transform 0.28s, border-color 0.28s;
 }
 
 .feature-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+  box-shadow: 0 16px 26px rgba(30, 64, 175, 0.12);
+  border-color: #c7d2fe;
+  transform: translateY(-4px);
 }
 
 .feature-card h3 {
@@ -1442,8 +1464,8 @@ body {
 
 .trend-stat-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
   padding: 1rem 1.25rem;
   text-align: center;
 }
@@ -1476,8 +1498,8 @@ body {
 
 .trend-chart-card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
   padding: 1.25rem 1.5rem;
 }
 
