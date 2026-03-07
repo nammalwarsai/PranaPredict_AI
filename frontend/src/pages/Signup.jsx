@@ -11,29 +11,38 @@ function Signup() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
+  e.preventDefault();
+  setError(null);
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+  // password match check
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    return;
+  }
 
-    setLoading(true);
-    const { data, error } = await signUp(email, password, phone);
-    setLoading(false);
+  // phone validation (10 digits)
+  const cleanedPhone = phone.replace(/\D/g, "");
+  if (cleanedPhone.length !== 10) {
+    setError("Phone number must contain exactly 10 digits");
+    return;
+  }
 
-    if (error) {
-      setError(error.message);
-    } else if (data?.user?.identities?.length === 0) {
-      setError("An account with this email already exists");
-    } else {
-      setSuccess(true);
-    }
-  };
+  setLoading(true);
+  const { data, error } = await signUp(email, password, cleanedPhone);
+  setLoading(false);
 
+  if (error) {
+    setError(error.message);
+  } else if (data?.user?.identities?.length === 0) {
+    setError("An account with this email already exists");
+  } else {
+    setSuccess(true);
+  }
+};
   if (success) {
     return (
       <div className="auth-page">
@@ -75,40 +84,78 @@ function Signup() {
           <div className="form-group">
             <label htmlFor="phone">Phone Number</label>
             <input
-              type="tel"
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 9876543210"
-              required
-            />
+  type="tel"
+  id="phone"
+  value={phone}
+  onChange={(e) => setPhone(e.target.value)}
+  placeholder="9876543210"
+  pattern="[0-9]{10}"
+  maxLength={10}
+  required
+/>
           </div>
+<div className="form-group">
+  <label htmlFor="password">Password</label>
+  <div style={{ position: "relative" }}>
+    <input
+      type={showPassword ? "text" : "password"}
+      id="password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      placeholder="Min 6 characters"
+      required
+      minLength={6}
+      style={{ paddingRight: "40px" }}
+    />
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min 6 characters"
-              required
-              minLength={6}
-            />
-          </div>
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      style={{
+        position: "absolute",
+        right: "10px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        background: "none",
+        border: "none",
+        cursor: "pointer"
+      }}
+    >
+      {showPassword ? "🙈" : "👁"}
+    </button>
+  </div>
+</div>
+<div className="form-group">
+  <label htmlFor="confirmPassword">Confirm Password</label>
+  <div style={{ position: "relative" }}>
+    <input
+      type={showConfirmPassword ? "text" : "password"}
+      id="confirmPassword"
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      placeholder="Re-enter password"
+      required
+      minLength={6}
+      style={{ paddingRight: "40px" }}
+    />
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re-enter password"
-              required
-              minLength={6}
-            />
-          </div>
+    <button
+      type="button"
+      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      style={{
+        position: "absolute",
+        right: "10px",
+        top: "50%",
+        transform: "translateY(-50%)",
+        background: "none",
+        border: "none",
+        cursor: "pointer"
+      }}
+    >
+      {showConfirmPassword ? "🙈" : "👁"}
+    </button>
+  </div>
+</div>
 
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? "Creating account..." : "Sign Up"}
