@@ -34,13 +34,12 @@ function Navbar() {
 
   // Close menu on Escape key
   useEffect(() => {
+    if (!menuOpen) return;
     const handleEscape = (e) => {
-      if (e.key === "Escape") closeMenu();
+      if (e.key === "Escape" && menuOpen) closeMenu();
     };
-    if (menuOpen) {
-      document.addEventListener("keydown", handleEscape);
-      return () => document.removeEventListener("keydown", handleEscape);
-    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [menuOpen, closeMenu]);
 
   const handleSignOut = async () => {
