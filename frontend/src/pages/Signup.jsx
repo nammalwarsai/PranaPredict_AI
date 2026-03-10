@@ -51,7 +51,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
           <div className="auth-success">
             <h2>Account Created!</h2>
             <p>Check your email for a confirmation link to activate your account.</p>
-            <Link to="/login" className="auth-btn" style={{ display: "block", textAlign: "center", textDecoration: "none", marginTop: "1rem" }}>
+            <Link to="/login" className="auth-btn auth-btn--link">
               Go to Login
             </Link>
           </div>
@@ -96,7 +96,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
           </div>
 <div className="form-group">
   <label htmlFor="password">Password</label>
-  <div style={{ position: "relative" }}>
+  <div className="password-wrapper">
     <input
       type={showPassword ? "text" : "password"}
       id="password"
@@ -105,21 +105,13 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       placeholder="Min 6 characters"
       required
       minLength={6}
-      style={{ paddingRight: "40px" }}
+      className="password-input"
     />
-
     <button
       type="button"
+      className="password-toggle"
       onClick={() => setShowPassword(!showPassword)}
-      style={{
-        position: "absolute",
-        right: "10px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        background: "none",
-        border: "none",
-        cursor: "pointer"
-      }}
+      aria-label={showPassword ? "Hide password" : "Show password"}
     >
       {showPassword ? "🙈" : "👁"}
     </button>
@@ -127,7 +119,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 </div>
 <div className="form-group">
   <label htmlFor="confirmPassword">Confirm Password</label>
-  <div style={{ position: "relative" }}>
+  <div className="password-wrapper">
     <input
       type={showConfirmPassword ? "text" : "password"}
       id="confirmPassword"
@@ -136,21 +128,13 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       placeholder="Re-enter password"
       required
       minLength={6}
-      style={{ paddingRight: "40px" }}
+      className="password-input"
     />
-
     <button
       type="button"
+      className="password-toggle"
       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-      style={{
-        position: "absolute",
-        right: "10px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        background: "none",
-        border: "none",
-        cursor: "pointer"
-      }}
+      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
     >
       {showConfirmPassword ? "🙈" : "👁"}
     </button>
