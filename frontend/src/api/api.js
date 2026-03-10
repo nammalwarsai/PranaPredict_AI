@@ -3,7 +3,7 @@ import supabase from "../config/supabaseClient";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000",
-  timeout: 30000,
+  timeout: 15000,
 });
 
 // ── Session tracking ────────────────────────────────────────────────
@@ -46,14 +46,30 @@ API.interceptors.request.use(async (config) => {
   return config;
 });
 
+// ── Prediction with request cancellation ────────────────────────────
+// Cancels any in-flight prediction request before sending a new one,
+// preventing duplicate submissions and wasted server work.
+let _predictionController = null;
+
 // Health check
 export const checkHealth = () => API.get("/api/health");
 
 // Prediction
-export const submitPrediction = (healthData) => API.post("/api/predict", healthData);
+export const submitPrediction = (healthData) => {
+  if (_predictionController) {
+    _predictionController.abort();
+    _predictionController = null;
+  }
+  _predictionController = new AbortController();
+  return API.post("/api/predict", healthData, {
+    signal: _predictionController.signal,
+    // LLM calls can be slow; give this endpoint its own generous timeout
+    timeout: 30000,
+  });
+};
 
 // Reports
-export const getReports = () => API.get("/api/reports");
+export const getReports = (page = 1) => API.get("/api/reports", { params: { page } });
 export const getReportById = (id) => API.get(`/api/reports/${id}`);
 
 export default API;

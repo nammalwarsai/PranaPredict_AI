@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const compression = require("compression");
 const authMiddleware = require("./middlewares/authMiddleware");
 const predictionRoutes = require("./routes/predictionRoutes");
 const reportRoutes = require("./routes/reportRoutes");
@@ -11,6 +12,9 @@ const app = express();
 
 // Security headers
 app.use(helmet());
+
+// Gzip compression — reduces response sizes significantly
+app.use(compression());
 
 // Rate limiting
 const apiLimiter = rateLimit({

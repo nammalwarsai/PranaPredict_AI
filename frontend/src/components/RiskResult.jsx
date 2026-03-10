@@ -13,9 +13,7 @@ function getRiskColor(level) {
 }
 
 function RiskResult({ result }) {
-  if (!result) return null;
-
-  const { riskScore, riskLevel, advice, healthData, model } = result;
+  const { riskScore, riskLevel, advice, healthData, model } = result || {};
 
   const renderedAdvice = useMemo(() => {
     if (!advice) return null;
@@ -38,6 +36,8 @@ function RiskResult({ result }) {
   }, [advice]);
 
   const riskColor = getRiskColor(riskLevel);
+
+  if (!result) return null;
 
   return (
     <div className="risk-result">
