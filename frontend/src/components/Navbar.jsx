@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/ThemeContext";
@@ -27,8 +28,23 @@ function Navbar() {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // Close menu on Escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") closeMenu();
+    };
+    if (menuOpen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [menuOpen, closeMenu]);
 
   const handleSignOut = async () => {
+    closeMenu();
     await signOut();
     navigate("/login", { replace: true });
   };
@@ -52,19 +68,34 @@ function Navbar() {
         <Link to="/">PranaPredict AI</Link>
       </div>
 
-      <div className="navbar-links">
+      <button
+        className={`navbar-hamburger${menuOpen ? " open" : ""}`}
+        onClick={() => setMenuOpen((v) => !v)}
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={menuOpen}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      {menuOpen && (
+        <div className="navbar-overlay" onClick={closeMenu} aria-hidden="true" />
+      )}
+
+      <div className={`navbar-links${menuOpen ? " navbar-links--open" : ""}`}>
         {!loading && user ? (
           <>
-            <Link to="/dashboard" className={isActive("/dashboard") ? "active" : ""}>
+            <Link to="/dashboard" className={isActive("/dashboard") ? "active" : ""} onClick={closeMenu}>
               Dashboard
             </Link>
-            <Link to="/history" className={isActive("/history") ? "active" : ""}>
+            <Link to="/history" className={isActive("/history") ? "active" : ""} onClick={closeMenu}>
               History
             </Link>
-            <Link to="/health-tips" className={isActive("/health-tips") ? "active" : ""}>
+            <Link to="/health-tips" className={isActive("/health-tips") ? "active" : ""} onClick={closeMenu}>
               Health Tips
             </Link>
-            <Link to="/profile" className={isActive("/profile") ? "active" : ""}>
+            <Link to="/profile" className={isActive("/profile") ? "active" : ""} onClick={closeMenu}>
               Profile
             </Link>
             {themeButton}
@@ -74,13 +105,13 @@ function Navbar() {
           </>
         ) : !loading ? (
           <>
-            <Link to="/" className={isActive("/") ? "active" : ""}>
+            <Link to="/" className={isActive("/") ? "active" : ""} onClick={closeMenu}>
               Home
             </Link>
-            <Link to="/login" className={isActive("/login") ? "active" : ""}>
+            <Link to="/login" className={isActive("/login") ? "active" : ""} onClick={closeMenu}>
               Sign In
             </Link>
-            <Link to="/signup" className={isActive("/signup") ? "active" : ""}>
+            <Link to="/signup" className={isActive("/signup") ? "active" : ""} onClick={closeMenu}>
               Sign Up
             </Link>
             {themeButton}
