@@ -19,7 +19,7 @@ function getClient() {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    timeout: 60000,
+    timeout: 30000,
   });
   return _client;
 }

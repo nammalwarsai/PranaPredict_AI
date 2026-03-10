@@ -3,7 +3,15 @@ const supabase = require("../config/supabaseClient");
 // In-memory token cache: token -> { user, expiresAt }
 const tokenCache = new Map();
 const CACHE_TTL_MS = 15 * 1000; // 15 seconds — short to limit stale token exposure
-const AUTH_TIMEOUT_MS = 8000;
+const AUTH_TIMEOUT_MS = 3000;
+
+// Periodically evict expired entries so the Map never holds stale tokens long-term
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of tokenCache) {
+    if (now > entry.expiresAt) tokenCache.delete(key);
+  }
+}, CACHE_TTL_MS);
 
 function withTimeout(promise, timeoutMs) {
   return Promise.race([

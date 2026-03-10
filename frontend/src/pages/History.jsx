@@ -156,15 +156,19 @@ function History() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
 
   useEffect(() => {
     let active = true;
 
     async function fetchReports() {
+      setLoading(true);
       try {
-        const response = await getReports();
+        const response = await getReports(page);
         if (!active) return;
         setReports(response.data.data || []);
+        setPagination(response.data.pagination || null);
       } catch (err) {
         if (!active) return;
         if (err.code === "ECONNABORTED") {
@@ -189,7 +193,7 @@ function History() {
       active = false;
       clearTimeout(safetyTimer);
     };
-  }, []);
+  }, [page]);
 
   const handleDownload = useCallback((report) => {
     downloadPDF(report);
@@ -204,20 +208,22 @@ function History() {
     );
   }
 
+  const totalPages = pagination?.totalPages ?? 1;
+
   return (
     <div className="history-page">
       <h1>Health Report History</h1>
 
       {error && <div className="error-message">{error}</div>}
 
-      {reports.length === 0 ? (
+      {reports.length === 0 && !error ? (
         <div className="empty-state">
           <span className="empty-icon">&#128203;</span>
           <p>No reports yet. Go to the Dashboard to create your first health assessment.</p>
         </div>
       ) : (
         <>
-        {reports.length >= 2 && <TrendCharts reports={reports} />}
+        {page === 1 && reports.length >= 2 && <TrendCharts reports={reports} />}
         <div className="reports-list">
           {reports.map((report) => (
             <div key={report.id} className="report-card">
@@ -273,6 +279,26 @@ function History() {
             </div>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              className="pagination-btn"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              ← Previous
+            </button>
+            <span className="pagination-info">Page {page} of {totalPages}</span>
+            <button
+              className="pagination-btn"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next →
+            </button>
+          </div>
+        )}
         </>
       )}
     </div>

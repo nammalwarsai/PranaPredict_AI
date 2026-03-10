@@ -20,10 +20,12 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
  */
 const _authClientCache = new Map();
 const AUTH_CLIENT_MAX = 200;
+const AUTH_CLIENT_TTL_MS = 5 * 60 * 1000; // 5 minutes — aligns with typical JWT expiry window
 
 function createAuthClient(accessToken) {
+  const now = Date.now();
   const cached = _authClientCache.get(accessToken);
-  if (cached) return cached;
+  if (cached && now < cached.expiresAt) return cached.client;
 
   const client = createClient(
     SUPABASE_URL,
@@ -37,9 +39,9 @@ function createAuthClient(accessToken) {
     }
   );
 
-  _authClientCache.set(accessToken, client);
+  _authClientCache.set(accessToken, { client, expiresAt: now + AUTH_CLIENT_TTL_MS });
 
-  // Prevent unbounded growth: evict oldest entry
+  // Prevent unbounded growth: evict oldest entry when over the limit
   if (_authClientCache.size > AUTH_CLIENT_MAX) {
     const firstKey = _authClientCache.keys().next().value;
     _authClientCache.delete(firstKey);
