@@ -170,31 +170,50 @@ export function AuthProvider({ children }) {
 
   const updateProfile = useCallback(async (updates) => {
     if (!user) return { error: { message: "Not authenticated" } };
+
+    // 1. Capture current state for rollback
+    const previousProfile = profile;
+
+    // 2. Optimistic Update: instantly update the UI
+    const optimisticProfile = {
+      ...previousProfile,
+      ...updates,
+      id: user.id,
+      email: user.email || "",
+      updated_at: new Date().toISOString(),
+    };
+    setProfile(optimisticProfile);
+
     try {
+      // 3. Background DB Update: use .update() instead of .upsert() since the 
+      // row is guaranteed to exist via the DB trigger. This is faster and avoids
+      // constraint evaluation hangs.
       const { data, error } = await supabase
         .from("profiles")
-        .upsert(
-          {
-            id: user.id,
-            email: user.email || "",
-            ...updates,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "id" }
-        )
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id)
         .select()
         .single();
+
       if (error) {
-        console.error("updateProfile error:", error.message);
+        console.error("updateProfile DB error:", error.message);
+        setProfile(previousProfile);
         return { data: null, error };
       }
+
+      // If the DB returns slightly different data (e.g. trigger modified), update it
       if (data) setProfile(data);
-      return { data, error: null };
+
+      return { data: data || optimisticProfile, error: null };
     } catch (err) {
       console.error("updateProfile failed:", err?.message || err);
+      setProfile(previousProfile);
       return { data: null, error: err };
     }
-  }, [user]);
+  }, [user, profile]);
 
   const syncProfile = useCallback(async () => {
     if (!user) return { error: { message: "Not authenticated" } };
