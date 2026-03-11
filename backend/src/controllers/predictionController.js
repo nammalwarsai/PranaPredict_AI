@@ -2,6 +2,7 @@ const { z } = require("zod");
 const { calculateRiskScore } = require("../services/riskCalculator");
 const { generateHealthAdvice } = require("../services/llmService");
 const { createAuthClient } = require("../config/supabaseClient");
+const { sendPredictionEmail } = require("../services/emailService");
 
 // Strict input schema
 const predictSchema = z.object({
@@ -60,18 +61,24 @@ async function predict(req, res, next) {
       });
     }
 
-    res.json({
-      success: true,
-      data: {
-        id: report?.id,
-        healthData,
-        riskScore: riskResult.score,
-        riskLevel: riskResult.level,
-        advice: llmResult.advice,
-        model: llmResult.model,
-        createdAt: report?.created_at,
-      },
-    });
+    const responseData = {
+      id: report?.id,
+      healthData,
+      riskScore: riskResult.score,
+      riskLevel: riskResult.level,
+      advice: llmResult.advice,
+      model: llmResult.model,
+      createdAt: report?.created_at,
+    };
+
+    // Fire-and-forget: send prediction email without blocking the response
+    const userEmail = req.user?.email;
+    const userName = req.user?.user_metadata?.full_name || userEmail?.split("@")[0] || "User";
+    if (userEmail) {
+      sendPredictionEmail(userEmail, userName, responseData).catch(() => {});
+    }
+
+    res.json({ success: true, data: responseData });
   } catch (error) {
     next(error);
   }

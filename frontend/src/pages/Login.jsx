@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { sendLoginNotification } from "../api/api";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,8 @@ function Login() {
     if (error) {
       setError(error.message);
     } else {
+      // Fire-and-forget login notification email
+      sendLoginNotification().catch(() => {});
       navigate("/dashboard");
     }
   };

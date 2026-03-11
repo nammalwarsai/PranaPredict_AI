@@ -72,4 +72,8 @@ export const submitPrediction = (healthData) => {
 export const getReports = (page = 1) => API.get("/api/reports", { params: { page } });
 export const getReportById = (id) => API.get(`/api/reports/${id}`);
 
+// Email notifications
+export const sendLoginNotification = () => API.post("/api/email/login");
+export const sendLogoutNotification = () => API.post("/api/email/logout");
+
 export default API;
