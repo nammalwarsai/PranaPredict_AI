@@ -61,7 +61,7 @@ We provide `.github/workflows/deploy.yml` to lint/build and deploy. It triggers 
 
 Workflow highlights:
 - **Backend job**: install deps, then POST to Render deploy hook.
-- **Frontend job**: install deps, run `npm run lint` + `npm run build`, then deploy via `vercel deploy --prebuilt --prod`.
+- **Frontend job**: install deps, run `npm run lint`, then `vercel build` and deploy via `vercel deploy --prebuilt --prod`.
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -109,10 +109,9 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+       cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
-      - run: npm run build
       - name: Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
