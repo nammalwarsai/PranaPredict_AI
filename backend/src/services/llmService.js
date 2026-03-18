@@ -5,7 +5,11 @@ const {
 } = require("../config/hfClient");
 
 function buildPrompt(healthData, riskResult) {
-  const { age, bmi, bloodPressure, cholesterol, smoking, activityLevel } = healthData;
+  const { 
+    age, bmi, bloodPressure, cholesterol, smoking, activityLevel,
+    location, dietType, alcoholConsumption, waterIntake, sleepDuration, workType,
+    diabetes, hypertension, heartDisease, kidneyDisease
+  } = healthData;
   const { score, level } = riskResult;
 
   return `You are PranaPredict AI, a health wellness advisor inspired by Ayurveda and modern preventive medicine. Analyze the following health data and provide personalized, actionable advice.
@@ -17,15 +21,24 @@ Patient Health Data:
 - Cholesterol: ${cholesterol || "N/A"}
 - Smoking: ${smoking ? "Yes" : "No"}
 - Activity Level: ${activityLevel || "N/A"}
+- Work & Location: ${workType || "N/A"} / ${location || "N/A"}
+- Diet & Alcohol: ${dietType || "N/A"} diet, ${alcoholConsumption || "N/A"} alcohol
+- Water Intake: ${waterIntake || 0} liters/day
+- Sleep: ${sleepDuration || 0} hours/day
+- Pre-existing Conditions: ${[diabetes && 'Diabetes', hypertension && 'Hypertension', heartDisease && 'Heart Disease', kidneyDisease && 'Kidney Disease'].filter(Boolean).join(', ') || 'None'}
 - Risk Score: ${score}/100 (${level} Risk)
 
-Provide a concise health assessment in this format:
-1. **Risk Summary**: One sentence about their overall risk.
-2. **Key Concerns**: List 2-3 specific health concerns based on their data.
-3. **Recommendations**: 3-4 actionable lifestyle changes (diet, exercise, habits) inspired by Ayurvedic wellness principles and modern medicine.
-4. **Positive Note**: One encouraging observation about their health.
+Provide a highly comprehensive and exhaustively detailed health assessment. The report MUST CONSTITUTE NO LESS THAN 150 LINES of detailed text.
 
-Keep the response under 250 words. Be specific to their data, not generic.`;
+Format the response strictly using markdown outlines and deep paragraphs covering the following mandatory sections:
+1. **Executive Risk Summary**: Extremely thorough analysis of their overall risk level.
+2. **Key Predictive Concerns**: In-depth medical elaboration on at least 4 specific health concerns derived directly from their data points (BP, BMI, habits, history). Explain the biochemical and physiological reasons.
+3. **Ayurvedic Insights**: Detailed Ayurvedic assessment (Dosha balancing) corresponding to their attributes, mentioning herbs, lifestyle, and philosophy.
+4. **Extensive Recommendations**: 10-15 deep, actionable lifestyle changes (diet, daily routine, mental health, exercise). Provide specific scientifically backed reasons.
+5. **Pathological Risk Forecast**: What their long-term health trajectory looks like if habits aren't changed.
+6. **Encouraging Observation**: Expand on the positives in their profile deeply.
+
+CRITICAL REQUIREMENT: Do not summarize. You must write an extensive, highly informative essay covering every possible angle. Ensure the output is visually long using paragraphs and lists, guaranteed exceeding 150 lines.`;
 }
 
 async function generateHealthAdvice(healthData, riskResult) {
@@ -49,8 +62,8 @@ async function generateHealthAdvice(healthData, riskResult) {
           content: prompt,
         },
       ],
-      max_tokens: 350,
-      temperature: 0.6,
+      max_tokens: 2800,
+      temperature: 0.7,
       top_p: 0.95,
     });
 

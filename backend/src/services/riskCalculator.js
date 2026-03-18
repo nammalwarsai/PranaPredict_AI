@@ -4,8 +4,18 @@
  */
 
 function calculateRiskScore(healthData) {
-  const { age, bmi, bloodPressure, cholesterol, smoking, activityLevel } = healthData;
+  const { 
+    age, bmi, bloodPressure, cholesterol, smoking, activityLevel,
+    diabetes, hypertension, heartDisease, kidneyDisease,
+    dietType, waterIntake, sleepDuration, alcoholConsumption, workType 
+  } = healthData;
   let score = 0;
+
+  // Medical conditions
+  if (heartDisease) score += 20;
+  if (diabetes) score += 15;
+  if (hypertension) score += 15;
+  if (kidneyDisease) score += 15;
 
   // BMI scoring
   if (bmi > 30) score += 20;
@@ -37,8 +47,22 @@ function calculateRiskScore(healthData) {
   if (age > 50) score += 10;
   else if (age > 40) score += 5;
 
+  // Lifestyle scoring
+  if (dietType === "junk-heavy") score += 10;
+  else if (dietType === "vegetarian") score -= 5;
+  
+  if (alcoholConsumption === "frequent") score += 15;
+  else if (alcoholConsumption === "occasional") score += 5;
+  
+  if (workType === "sedentary") score += 5;
+  if (sleepDuration < 6) score += 10;
+  else if (sleepDuration >= 7 && sleepDuration <= 9) score -= 5;
+
+  if (waterIntake < 1.5) score += 5;
+  else if (waterIntake > 2.5) score -= 5;
+
   // Cap score at 100
-  const finalScore = Math.min(score, 100);
+  const finalScore = Math.max(0, Math.min(score, 100));
 
   return {
     score: finalScore,

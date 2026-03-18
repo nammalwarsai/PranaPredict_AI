@@ -16,6 +16,16 @@ const predictSchema = z.object({
   cholesterol: z.enum(["normal", "borderline", "high"]).optional().default("normal"),
   smoking: z.boolean().optional().default(false),
   activityLevel: z.enum(["low", "moderate", "high"]).optional().default("moderate"),
+  diabetes: z.boolean().optional().default(false),
+  hypertension: z.boolean().optional().default(false),
+  heartDisease: z.boolean().optional().default(false),
+  kidneyDisease: z.boolean().optional().default(false),
+  location: z.enum(["urban", "rural"]).optional().default("urban"),
+  dietType: z.enum(["vegetarian", "non-veg", "junk-heavy"]).optional().default("vegetarian"),
+  waterIntake: z.number().min(0).max(20).optional().default(2),
+  sleepDuration: z.number().min(0).max(24).optional().default(7),
+  alcoholConsumption: z.enum(["none", "occasional", "frequent"]).optional().default("none"),
+  workType: z.enum(["active", "sedentary"]).optional().default("active"),
 });
 
 async function predict(req, res, next) {
@@ -27,8 +37,17 @@ async function predict(req, res, next) {
       return res.status(400).json({ success: false, error: "Validation failed", details: messages });
     }
 
-    const { age, bmi, bloodPressure, cholesterol, smoking, activityLevel } = parseResult.data;
-    const healthData = { age, bmi, bloodPressure, cholesterol, smoking, activityLevel };
+    const { 
+      age, bmi, bloodPressure, cholesterol, smoking, activityLevel,
+      diabetes, hypertension, heartDisease, kidneyDisease, location,
+      dietType, waterIntake, sleepDuration, alcoholConsumption, workType 
+    } = parseResult.data;
+    
+    const healthData = { 
+      age, bmi, bloodPressure, cholesterol, smoking, activityLevel,
+      diabetes, hypertension, heartDisease, kidneyDisease, location,
+      dietType, waterIntake, sleepDuration, alcoholConsumption, workType 
+    };
 
     const riskResult = calculateRiskScore(healthData);
 
@@ -46,6 +65,16 @@ async function predict(req, res, next) {
         cholesterol,
         smoking,
         activity_level: activityLevel,
+        diabetes,
+        hypertension,
+        heart_disease: heartDisease,
+        kidney_disease: kidneyDisease,
+        location,
+        diet_type: dietType,
+        water_intake: waterIntake,
+        sleep_duration: sleepDuration,
+        alcohol_consumption: alcoholConsumption,
+        work_type: workType,
         risk_score: riskResult.score,
         risk_level: riskResult.level,
         llm_advice: llmResult.advice,

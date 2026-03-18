@@ -72,6 +72,13 @@ function downloadPDF(report) {
   doc.line(margin, y, margin + 50, y);
   y += 10;
 
+  const conditions = [
+    report.diabetes && "Diabetes",
+    report.hypertension && "Hypertension",
+    report.heart_disease && "Heart Disease",
+    report.kidney_disease && "Kidney Disease"
+  ].filter(Boolean).join(", ") || "None";
+
   const healthFields = [
     ["Age", `${report.age} years`],
     ["BMI", `${report.bmi}`],
@@ -79,6 +86,12 @@ function downloadPDF(report) {
     ["Cholesterol", report.cholesterol || "N/A"],
     ["Smoking", report.smoking ? "Yes" : "No"],
     ["Activity Level", report.activity_level || "N/A"],
+    ["Location", report.location || "N/A"],
+    ["Work Type", report.work_type || "N/A"],
+    ["Diet Type", report.diet_type || "N/A"],
+    ["Alcohol", report.alcohol_consumption || "N/A"],
+    ["Water Intake", `${report.water_intake || 0} L`],
+    ["Sleep Duration", `${report.sleep_duration || 0} hrs`],
   ];
 
   doc.setFontSize(10);
@@ -97,7 +110,16 @@ function downloadPDF(report) {
     doc.text(field[1], xPos, yPos + 6);
   });
 
-  y += Math.ceil(healthFields.length / 2) * 16 + 8;
+  // Render Conditions taking up a full row
+  const conditionsY = y + Math.ceil(healthFields.length / 2) * 16;
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(100, 116, 139);
+  doc.text("Pre-existing Conditions", margin, conditionsY);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(30, 41, 59);
+  doc.text(conditions, margin, conditionsY + 6);
+
+  y = conditionsY + 16;
 
   if (report.llm_advice) {
     doc.setFontSize(14);
