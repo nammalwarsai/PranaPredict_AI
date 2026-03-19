@@ -1,14 +1,29 @@
 const nodemailer = require("nodemailer");
 
+const FRONTEND_PUBLIC_URL = (process.env.FRONTEND_PUBLIC_URL || "http://localhost:5173").replace(/\/$/, "");
+const DASHBOARD_URL = `${FRONTEND_PUBLIC_URL}/dashboard`;
+const LOGIN_URL = `${FRONTEND_PUBLIC_URL}/login`;
+
+const emailAppPassword = (process.env.EMAIL_APP_PASSWORD || "").replace(/\s+/g, "");
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   secure: false, // use STARTTLS on port 587 (more reliable than SSL on 465)
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
+    pass: emailAppPassword,
   },
 });
+
+async function verifySmtpConnection() {
+  try {
+    await transporter.verify();
+    console.log("[SMTP] Transport verified successfully.");
+  } catch (err) {
+    console.error("[SMTP] Verification failed:", err.message);
+  }
+}
 
 // ── Shared styling tokens ────────────────────────────────────────────
 const BRAND = {
@@ -161,7 +176,7 @@ function buildPredictionEmail(userName, data) {
     <!-- CTA -->
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr><td align="center">
-        <a href="http://localhost:5173/dashboard" style="display:inline-block;background:linear-gradient(135deg,${BRAND.primary},${BRAND.accent});color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 36px;border-radius:8px;letter-spacing:0.3px;">
+        <a href="${DASHBOARD_URL}" style="display:inline-block;background:linear-gradient(135deg,${BRAND.primary},${BRAND.accent});color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 36px;border-radius:8px;letter-spacing:0.3px;">
           View Full Dashboard →
         </a>
       </td></tr>
@@ -224,7 +239,7 @@ function buildLoginEmail(userName) {
     <!-- CTA -->
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr><td align="center">
-        <a href="http://localhost:5173/dashboard" style="display:inline-block;background:linear-gradient(135deg,${BRAND.primary},${BRAND.accent});color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 36px;border-radius:8px;">
+        <a href="${DASHBOARD_URL}" style="display:inline-block;background:linear-gradient(135deg,${BRAND.primary},${BRAND.accent});color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 36px;border-radius:8px;">
           Go to Dashboard →
         </a>
       </td></tr>
@@ -291,7 +306,7 @@ function buildLogoutEmail(userName) {
     <!-- CTA -->
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr><td align="center">
-        <a href="http://localhost:5173/login" style="display:inline-block;background:linear-gradient(135deg,${BRAND.primary},${BRAND.accent});color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 36px;border-radius:8px;">
+        <a href="${LOGIN_URL}" style="display:inline-block;background:linear-gradient(135deg,${BRAND.primary},${BRAND.accent});color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 36px;border-radius:8px;">
           Sign In Again →
         </a>
       </td></tr>
@@ -350,4 +365,4 @@ async function sendLogoutEmail(toEmail, userName) {
   }
 }
 
-module.exports = { sendPredictionEmail, sendLoginEmail, sendLogoutEmail };
+module.exports = { sendPredictionEmail, sendLoginEmail, sendLogoutEmail, verifySmtpConnection };

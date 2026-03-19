@@ -28,7 +28,11 @@ const apiLimiter = rateLimit({
 app.use("/api/", apiLimiter);
 
 // CORS — support comma-separated allowlist via FRONTEND_URL env
-const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+const allowedOrigins = (
+  process.env.FRONTEND_URL ||
+  process.env.FRONTEND_PUBLIC_URL ||
+  "http://localhost:5173"
+)
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean);
