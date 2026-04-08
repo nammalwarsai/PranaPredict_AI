@@ -530,6 +530,18 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: 0 12px 22px rgba(33, 102, 166, 0.28);
 }
 
+.submit-btn:disabled,
+.auth-btn:disabled,
+.download-pdf-btn:disabled,
+.btn-primary:disabled,
+.pagination-btn:disabled,
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-outline {
   border-radius: 999px;
 }

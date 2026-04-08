@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { getReports } from "../api/api";
-import { jsPDF } from "jspdf";
 import TrendCharts from "../components/TrendCharts";
+import { generateHealthReportPdf } from "../utils/pdfReportGenerator";
 
 function getRiskColor(level) {
   switch (level) {
@@ -13,166 +13,14 @@ function getRiskColor(level) {
   }
 }
 
-function downloadPDF(report) {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 20;
-  const contentWidth = pageWidth - margin * 2;
-  let y = 20;
-
-  const riskColor = getRiskColor(report.risk_level);
-  const [r, g, b] = [
-    parseInt(riskColor.slice(1, 3), 16),
-    parseInt(riskColor.slice(3, 5), 16),
-    parseInt(riskColor.slice(5, 7), 16),
-  ];
-  doc.setFillColor(37, 99, 235);
-  doc.rect(0, 0, pageWidth, 48, "F");
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
-  doc.setFont("helvetica", "bold");
-  doc.text("PranaPredict AI", margin, y + 8);
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.text("Health Risk Assessment Report", margin, y + 18);
-
-  const reportDate = new Date(report.created_at).toLocaleDateString("en-IN", {
+function formatReportDate(value) {
+  return new Date(value).toLocaleDateString("en-IN", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
-  doc.setFontSize(9);
-  doc.text(reportDate, pageWidth - margin, y + 8, { align: "right" });
-  doc.text(`Report ID: ${report.id?.substring(0, 8) || "N/A"}`, pageWidth - margin, y + 16, { align: "right" });
-
-  y = 58;
-
-  doc.setFillColor(r, g, b);
-  doc.roundedRect(margin, y, contentWidth, 36, 4, 4, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(28);
-  doc.setFont("helvetica", "bold");
-  doc.text(`${report.risk_score}`, margin + contentWidth / 2 - 10, y + 18, { align: "center" });
-  doc.setFontSize(12);
-  doc.text(`/ 100`, margin + contentWidth / 2 + 12, y + 18);
-  doc.setFontSize(16);
-  doc.text(`${report.risk_level} Risk`, margin + contentWidth / 2, y + 30, { align: "center" });
-
-  y += 46;
-
-  doc.setTextColor(30, 41, 59);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("Health Data Summary", margin, y);
-  y += 3;
-  doc.setDrawColor(37, 99, 235);
-  doc.setLineWidth(0.8);
-  doc.line(margin, y, margin + 50, y);
-  y += 10;
-
-  const conditions = [
-    report.diabetes && "Diabetes",
-    report.hypertension && "Hypertension",
-    report.heart_disease && "Heart Disease",
-    report.kidney_disease && "Kidney Disease"
-  ].filter(Boolean).join(", ") || "None";
-
-  const healthFields = [
-    ["Age", `${report.age} years`],
-    ["BMI", `${report.bmi}`],
-    ["Blood Pressure", report.blood_pressure || "N/A"],
-    ["Cholesterol", report.cholesterol || "N/A"],
-    ["Smoking", report.smoking ? "Yes" : "No"],
-    ["Activity Level", report.activity_level || "N/A"],
-    ["Location", report.location || "N/A"],
-    ["Work Type", report.work_type || "N/A"],
-    ["Diet Type", report.diet_type || "N/A"],
-    ["Alcohol", report.alcohol_consumption || "N/A"],
-    ["Water Intake", `${report.water_intake || 0} L`],
-    ["Sleep Duration", `${report.sleep_duration || 0} hrs`],
-  ];
-
-  doc.setFontSize(10);
-  const colWidth = contentWidth / 2;
-  healthFields.forEach((field, i) => {
-    const col = i % 2;
-    const row = Math.floor(i / 2);
-    const xPos = margin + col * colWidth;
-    const yPos = y + row * 16;
-
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139);
-    doc.text(field[0], xPos, yPos);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(30, 41, 59);
-    doc.text(field[1], xPos, yPos + 6);
-  });
-
-  // Render Conditions taking up a full row
-  const conditionsY = y + Math.ceil(healthFields.length / 2) * 16;
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(100, 116, 139);
-  doc.text("Pre-existing Conditions", margin, conditionsY);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(30, 41, 59);
-  doc.text(conditions, margin, conditionsY + 6);
-
-  y = conditionsY + 16;
-
-  if (report.llm_advice) {
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(30, 41, 59);
-    doc.text("AI Health Advice", margin, y);
-    y += 3;
-    doc.setDrawColor(37, 99, 235);
-    doc.setLineWidth(0.8);
-    doc.line(margin, y, margin + 40, y);
-    y += 8;
-
-    const adviceLines = doc.splitTextToSize(report.llm_advice, contentWidth);
-    const lineHeight = 5.5;
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const bottomMargin = 30;
-
-    doc.setFontSize(9.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(30, 41, 59);
-
-    for (let i = 0; i < adviceLines.length; i++) {
-      if (y + lineHeight > pageHeight - bottomMargin) {
-        doc.addPage();
-        y = 25;
-        doc.setFontSize(14);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(30, 41, 59);
-        doc.text("AI Health Advice (continued)", margin, y);
-        y += 10;
-        doc.setFontSize(9.5);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(30, 41, 59);
-      }
-      doc.text(adviceLines[i], margin, y);
-      y += lineHeight;
-    }
-    y += 10;
-  }
-
-  const footerY = doc.internal.pageSize.getHeight() - 15;
-  doc.setDrawColor(226, 232, 240);
-  doc.setLineWidth(0.3);
-  doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(148, 163, 184);
-  doc.text("Generated by PranaPredict AI — For informational purposes only. Not a medical diagnosis.", margin, footerY);
-  doc.text(`Page 1`, pageWidth - margin, footerY, { align: "right" });
-
-  const fileName = `PranaPredict_Report_${report.risk_level}_${new Date(report.created_at).toISOString().slice(0, 10)}.pdf`;
-  doc.save(fileName);
 }
 
 function History() {
@@ -181,6 +29,7 @@ function History() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -219,7 +68,16 @@ function History() {
   }, [page]);
 
   const handleDownload = useCallback((report) => {
-    downloadPDF(report);
+    setDownloadingId(report.id);
+
+    try {
+      generateHealthReportPdf(report);
+    } catch (downloadError) {
+      console.error("PDF generation failed:", downloadError);
+      setError("Failed to generate PDF report. Please try again.");
+    } finally {
+      setDownloadingId(null);
+    }
   }, []);
 
   const pageHeader = (
@@ -268,13 +126,7 @@ function History() {
                   {report.risk_level} Risk
                 </span>
                 <span className="report-date">
-                  {new Date(report.created_at).toLocaleDateString("en-IN", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatReportDate(report.created_at)}
                 </span>
               </div>
               <div className="report-card-body">
@@ -285,7 +137,7 @@ function History() {
                   <span>Age: {report.age}</span>
                   <span>BMI: {report.bmi}</span>
                   <span>BP: {report.blood_pressure}</span>
-                  <span>Cholesterol: {report.cholesterol}</span>
+                  <span>Cholesterol: {report.cholesterol || "N/A"}</span>
                 </div>
               </div>
               {report.llm_advice && (
@@ -300,13 +152,14 @@ function History() {
                   className="download-pdf-btn"
                   onClick={() => handleDownload(report)}
                   title="Download PDF Report"
+                  disabled={downloadingId === report.id}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
-                  Download PDF
+                  {downloadingId === report.id ? "Preparing PDF..." : "Download Premium PDF"}
                 </button>
               </div>
             </div>
