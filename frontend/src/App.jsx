@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import Report from "./pages/Report";
 import HealthTips from "./pages/HealthTips";
 import "./App.css";
+import "./styles/design-system.css";
 
 function App() {
   return (
@@ -20,8 +21,9 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <div className="app">
+            <a className="skip-link" href="#main-content">Skip to main content</a>
             <Navbar />
-            <main className="main-content">
+            <main id="main-content" className="main-content" tabIndex={-1}>
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

@@ -32,7 +32,7 @@ function Login() {
         <h1>PranaPredict AI</h1>
         <p className="auth-subtitle">Sign in to your account</p>
 
-        {error && <div className="auth-error">{error}</div>}
+        {error && <div className="auth-error" role="alert" aria-live="assertive">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -43,6 +43,7 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
+              autoComplete="email"
               required
             />
           </div>
@@ -55,6 +56,7 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
+              autoComplete="current-password"
               required
               minLength={6}
             />

@@ -23,10 +23,25 @@ function Landing() {
               <Link to="/dashboard" className="btn-primary">Go to Dashboard</Link>
             ) : (
               <>
-                <Link to="/login" className="btn-primary">Go to Dashboard</Link>
+                <Link to="/login" className="btn-primary">Get Started</Link>
                 <Link to="/signup" className="btn-outline">Create Account</Link>
               </>
             )}
+          </div>
+
+          <div className="hero-kpis" aria-label="Platform highlights">
+            <div className="hero-kpi">
+              <strong>Risk Score</strong>
+              <span>0 to 100 precision model</span>
+            </div>
+            <div className="hero-kpi">
+              <strong>Instant Insights</strong>
+              <span>Personalized recommendations</span>
+            </div>
+            <div className="hero-kpi">
+              <strong>Longitudinal Tracking</strong>
+              <span>Monitor patterns over time</span>
+            </div>
           </div>
         </div>
         <div className="hero-visual">

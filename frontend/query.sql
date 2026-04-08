@@ -11,3 +11,4 @@ ADD COLUMN water_intake numeric,
 ADD COLUMN sleep_duration numeric,
 ADD COLUMN alcohol_consumption text,
 ADD COLUMN work_type text;
+

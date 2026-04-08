@@ -10,39 +10,43 @@ function Signup() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { signUp } = useAuth();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError(null);
+    e.preventDefault();
+    setError(null);
 
-  // password match check
-  if (password !== confirmPassword) {
-    setError("Passwords do not match");
-    return;
-  }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
-  // phone validation (10 digits)
-  const cleanedPhone = phone.replace(/\D/g, "");
-  if (cleanedPhone.length !== 10) {
-    setError("Phone number must contain exactly 10 digits");
-    return;
-  }
+    const cleanedPhone = phone.replace(/\D/g, "");
+    if (cleanedPhone.length !== 10) {
+      setError("Phone number must contain exactly 10 digits");
+      return;
+    }
 
-  setLoading(true);
-  const { data, error } = await signUp(email, password, cleanedPhone);
-  setLoading(false);
+    setLoading(true);
+    const { data, error: signUpError } = await signUp(email, password, cleanedPhone);
+    setLoading(false);
 
-  if (error) {
-    setError(error.message);
-  } else if (data?.user?.identities?.length === 0) {
-    setError("An account with this email already exists");
-  } else {
+    if (signUpError) {
+      setError(signUpError.message);
+      return;
+    }
+
+    if (data?.user?.identities?.length === 0) {
+      setError("An account with this email already exists");
+      return;
+    }
+
     setSuccess(true);
-  }
-};
+  };
+
   if (success) {
     return (
       <div className="auth-page">
@@ -66,7 +70,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
         <h1>PranaPredict AI</h1>
         <p className="auth-subtitle">Create your account</p>
 
-        {error && <div className="auth-error">{error}</div>}
+        {error && <div className="auth-error" role="alert" aria-live="assertive">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -77,6 +81,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
+              autoComplete="email"
               required
             />
           </div>
@@ -84,62 +89,67 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
           <div className="form-group">
             <label htmlFor="phone">Phone Number</label>
             <input
-  type="tel"
-  id="phone"
-  value={phone}
-  onChange={(e) => setPhone(e.target.value)}
-  placeholder="9876543210"
-  pattern="[0-9]{10}"
-  maxLength={10}
-  required
-/>
+              type="tel"
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="9876543210"
+              pattern="[0-9]{10}"
+              maxLength={10}
+              autoComplete="tel"
+              required
+            />
           </div>
-<div className="form-group">
-  <label htmlFor="password">Password</label>
-  <div className="password-wrapper">
-    <input
-      type={showPassword ? "text" : "password"}
-      id="password"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      placeholder="Min 6 characters"
-      required
-      minLength={6}
-      className="password-input"
-    />
-    <button
-      type="button"
-      className="password-toggle"
-      onClick={() => setShowPassword(!showPassword)}
-      aria-label={showPassword ? "Hide password" : "Show password"}
-    >
-      {showPassword ? "🙈" : "👁"}
-    </button>
-  </div>
-</div>
-<div className="form-group">
-  <label htmlFor="confirmPassword">Confirm Password</label>
-  <div className="password-wrapper">
-    <input
-      type={showConfirmPassword ? "text" : "password"}
-      id="confirmPassword"
-      value={confirmPassword}
-      onChange={(e) => setConfirmPassword(e.target.value)}
-      placeholder="Re-enter password"
-      required
-      minLength={6}
-      className="password-input"
-    />
-    <button
-      type="button"
-      className="password-toggle"
-      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-    >
-      {showConfirmPassword ? "🙈" : "👁"}
-    </button>
-  </div>
-</div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min 6 characters"
+                autoComplete="new-password"
+                required
+                minLength={6}
+                className="password-input"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <div className="password-wrapper">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
+                autoComplete="new-password"
+                required
+                minLength={6}
+                className="password-input"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
 
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? "Creating account..." : "Sign Up"}

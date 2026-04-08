@@ -24,6 +24,19 @@ const MoonIcon = () => (
   </svg>
 );
 
+const AUTH_LINKS = [
+  { to: "/dashboard", label: "Dashboard" },
+  { to: "/history", label: "History" },
+  { to: "/health-tips", label: "Health Tips" },
+  { to: "/profile", label: "Profile" },
+];
+
+const PUBLIC_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/login", label: "Sign In" },
+  { to: "/signup", label: "Sign Up" },
+];
+
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,6 +45,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
 
   // Close menu on Escape key
   useEffect(() => {
@@ -51,10 +65,11 @@ function Navbar() {
     navigate("/login", { replace: true });
   };
 
-  const isActive = (path) => location.pathname === path;
+  const links = !loading ? (user ? AUTH_LINKS : PUBLIC_LINKS) : [];
 
   const themeButton = (
     <button
+      type="button"
       className="theme-toggle"
       onClick={toggleTheme}
       title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
@@ -75,6 +90,7 @@ function Navbar() {
         onClick={() => setMenuOpen((v) => !v)}
         aria-label={menuOpen ? "Close menu" : "Open menu"}
         aria-expanded={menuOpen}
+        aria-controls="primary-navigation"
       >
         <span />
         <span />
@@ -85,40 +101,34 @@ function Navbar() {
         <div className="navbar-overlay" onClick={closeMenu} aria-hidden="true" />
       )}
 
-      <div className={`navbar-links${menuOpen ? " navbar-links--open" : ""}`}>
-        {!loading && user ? (
+      <div
+        id="primary-navigation"
+        className={`navbar-links${menuOpen ? " navbar-links--open" : ""}`}
+        role="navigation"
+        aria-label="Primary"
+      >
+        {links.map(({ to, label }) => (
+          <Link
+            key={to}
+            to={to}
+            className={isActive(to) ? "active" : ""}
+            aria-current={isActive(to) ? "page" : undefined}
+            onClick={closeMenu}
+          >
+            {label}
+          </Link>
+        ))}
+
+        {!loading && (
           <>
-            <Link to="/dashboard" className={isActive("/dashboard") ? "active" : ""} onClick={closeMenu}>
-              Dashboard
-            </Link>
-            <Link to="/history" className={isActive("/history") ? "active" : ""} onClick={closeMenu}>
-              History
-            </Link>
-            <Link to="/health-tips" className={isActive("/health-tips") ? "active" : ""} onClick={closeMenu}>
-              Health Tips
-            </Link>
-            <Link to="/profile" className={isActive("/profile") ? "active" : ""} onClick={closeMenu}>
-              Profile
-            </Link>
             {themeButton}
-            <button className="nav-signout" onClick={handleSignOut}>
-              Sign Out
-            </button>
+            {user && (
+              <button type="button" className="nav-signout" onClick={handleSignOut}>
+                Sign Out
+              </button>
+            )}
           </>
-        ) : !loading ? (
-          <>
-            <Link to="/" className={isActive("/") ? "active" : ""} onClick={closeMenu}>
-              Home
-            </Link>
-            <Link to="/login" className={isActive("/login") ? "active" : ""} onClick={closeMenu}>
-              Sign In
-            </Link>
-            <Link to="/signup" className={isActive("/signup") ? "active" : ""} onClick={closeMenu}>
-              Sign Up
-            </Link>
-            {themeButton}
-          </>
-        ) : null}
+        )}
       </div>
     </nav>
   );

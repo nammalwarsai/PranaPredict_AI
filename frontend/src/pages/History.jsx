@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { getReports } from "../api/api";
 import { jsPDF } from "jspdf";
 import TrendCharts from "../components/TrendCharts";
@@ -221,10 +222,19 @@ function History() {
     downloadPDF(report);
   }, []);
 
+  const pageHeader = (
+    <div className="page-head">
+      <div>
+        <h1 className="page-title">Health Report History</h1>
+        <p className="page-subtitle">Track your historical assessments, monitor trend movement, and export any report as PDF.</p>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="history-page">
-        <h1>Health Report History</h1>
+        {pageHeader}
         <p className="loading-text">Loading your reports...</p>
       </div>
     );
@@ -234,7 +244,7 @@ function History() {
 
   return (
     <div className="history-page">
-      <h1>Health Report History</h1>
+      {pageHeader}
 
       {error && <div className="error-message">{error}</div>}
 
@@ -242,6 +252,7 @@ function History() {
         <div className="empty-state">
           <span className="empty-icon">&#128203;</span>
           <p>No reports yet. Go to the Dashboard to create your first health assessment.</p>
+          <Link to="/dashboard" className="btn-primary empty-cta">Start Your First Assessment</Link>
         </div>
       ) : (
         <>

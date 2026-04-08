@@ -28,6 +28,11 @@ function Dashboard() {
         <span className="dashboard-header-icon">🩺</span>
         <h1>Health Risk Predictor</h1>
         <p>Enter your health data below to get an AI-powered risk assessment</p>
+        <div className="dashboard-meta">
+          <span>Secure form</span>
+          <span>•</span>
+          <span>Personalized guidance</span>
+        </div>
       </div>
 
       {error && <div className="error-message">{error}</div>}

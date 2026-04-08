@@ -59,16 +59,16 @@ function RiskResult({ result }) {
           <div><strong>Age:</strong> {healthData.age}</div>
           <div><strong>BMI:</strong> {healthData.bmi}</div>
           <div><strong>Blood Pressure:</strong> {healthData.bloodPressure}</div>
-          <div><strong>Cholesterol:</strong> <span style={{ textTransform: "capitalize" }}>{healthData.cholesterol}</span></div>
+          <div><strong>Cholesterol:</strong> <span className="text-capitalize">{healthData.cholesterol}</span></div>
           <div><strong>Smoking:</strong> {healthData.smoking ? "Yes" : "No"}</div>
-          <div><strong>Activity:</strong> <span style={{ textTransform: "capitalize" }}>{healthData.activityLevel}</span></div>
-          <div><strong>Location:</strong> <span style={{ textTransform: "capitalize" }}>{healthData.location}</span></div>
-          <div><strong>Work Type:</strong> <span style={{ textTransform: "capitalize" }}>{healthData.workType}</span></div>
-          <div><strong>Diet Type:</strong> <span style={{ textTransform: "capitalize" }}>{healthData.dietType}</span></div>
-          <div><strong>Alcohol:</strong> <span style={{ textTransform: "capitalize" }}>{healthData.alcoholConsumption}</span></div>
+          <div><strong>Activity:</strong> <span className="text-capitalize">{healthData.activityLevel}</span></div>
+          <div><strong>Location:</strong> <span className="text-capitalize">{healthData.location}</span></div>
+          <div><strong>Work Type:</strong> <span className="text-capitalize">{healthData.workType}</span></div>
+          <div><strong>Diet Type:</strong> <span className="text-capitalize">{healthData.dietType}</span></div>
+          <div><strong>Alcohol:</strong> <span className="text-capitalize">{healthData.alcoholConsumption}</span></div>
           <div><strong>Water:</strong> {healthData.waterIntake} L</div>
           <div><strong>Sleep:</strong> {healthData.sleepDuration} hrs</div>
-          <div style={{ gridColumn: "1 / -1" }}>
+          <div className="details-full-row">
             <strong>Pre-existing Conditions:</strong>{" "}
             {[
               healthData.diabetes && "Diabetes",

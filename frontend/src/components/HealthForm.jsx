@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { calculateBMI, getBMICategory } from "../utils/bmiCalculator";
 import "./HealthForm.css";
 
+const TOTAL_STEPS = 5;
+
+const CONDITION_FIELDS = [
+  { key: "diabetes", label: "Diabetes" },
+  { key: "hypertension", label: "Hypertension" },
+  { key: "heartDisease", label: "Heart Disease" },
+  { key: "kidneyDisease", label: "Kidney Disease" },
+];
+
+function toLabel(value) {
+  return String(value).replace(/-/g, " ");
+}
+
 function HealthForm({ onSubmit, loading }) {
   const [step, setStep] = useState(1);
-  const totalSteps = 5;
 
   const [formData, setFormData] = useState({
     // Step 1: Basic Info
@@ -30,23 +42,30 @@ function HealthForm({ onSubmit, loading }) {
     smoking: false,
   });
 
-  const [bmiInfo, setBmiInfo] = useState({ value: calculateBMI(70, 170), category: getBMICategory(calculateBMI(70, 170)) });
+  const bmiValue = useMemo(
+    () => calculateBMI(Number(formData.weight), Number(formData.height)),
+    [formData.weight, formData.height]
+  );
+
+  const bmiCategory = useMemo(
+    () => (bmiValue ? getBMICategory(bmiValue) : null),
+    [bmiValue]
+  );
+
+  const selectedConditions = useMemo(
+    () => CONDITION_FIELDS.filter(({ key }) => formData[key]).map(({ label }) => label),
+    [formData]
+  );
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    let newVal = value;
-    if (type === "checkbox") {
-      newVal = checked;
-    } else if (type === "range" || type === "number") {
-      newVal = parseFloat(value);
-    }
-    
-    const newData = {
-      ...formData,
-      [name]: newVal,
-    };
-    setFormData(newData);
-    updateBmiIfNecessary(name, newVal, newData);
+    const nextValue =
+      type === "checkbox" ? checked : type === "range" || type === "number" ? Number(value) : value;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: nextValue,
+    }));
   };
 
   const setToggleValue = (name, value) => {
@@ -54,31 +73,19 @@ function HealthForm({ onSubmit, loading }) {
     setFormData(newData);
   };
 
-  const updateBmiIfNecessary = (name, newVal, newData) => {
-    if (name === "weight" || name === "height") {
-      const bmi = calculateBMI(
-        parseFloat(name === "weight" ? newVal : newData.weight),
-        parseFloat(name === "height" ? newVal : newData.height)
-      );
-      if (bmi) {
-        setBmiInfo({ value: bmi, category: getBMICategory(bmi) });
-      }
-    }
-  };
-
-  const handleNext = () => setStep((s) => Math.min(totalSteps, s + 1));
+  const handleNext = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1));
   const handleBack = () => setStep((s) => Math.max(1, s - 1));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (step !== totalSteps) {
+    if (step !== TOTAL_STEPS) {
       handleNext();
       return;
     }
-    const bmi = calculateBMI(parseFloat(formData.weight), parseFloat(formData.height));
+
     const payload = {
-      age: parseInt(formData.age),
-      bmi: bmi,
+      age: Number.parseInt(formData.age, 10),
+      bmi: bmiValue,
       bloodPressure: `${formData.systolic}/${formData.diastolic}`,
       cholesterol: formData.cholesterol,
       diabetes: formData.diabetes,
@@ -94,6 +101,7 @@ function HealthForm({ onSubmit, loading }) {
       activityLevel: formData.activityLevel,
       smoking: formData.smoking,
     };
+
     onSubmit(payload);
   };
 
@@ -137,9 +145,9 @@ function HealthForm({ onSubmit, loading }) {
             <input type="range" name="height" min="50" max="250" step="0.5" value={formData.height} onChange={handleChange} required />
           </div>
 
-          {bmiInfo && (
-            <div className="bmi-display" style={{ marginTop: '1.5rem' }}>
-              BMI: <strong>{bmiInfo.value}</strong> ({bmiInfo.category})
+          {bmiValue && (
+            <div className="bmi-display" role="status" aria-live="polite">
+              BMI: <strong>{bmiValue}</strong> ({bmiCategory})
             </div>
           )}
         </div>
@@ -175,12 +183,26 @@ function HealthForm({ onSubmit, loading }) {
           </div>
 
           {/* Medical history toggles */}
-          {['diabetes', 'hypertension', 'heartDisease', 'kidneyDisease'].map((disease) => (
-            <div className="form-group" key={disease}>
-              <label>{disease.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</label>
+          {CONDITION_FIELDS.map(({ key, label }) => (
+            <div className="form-group" key={key}>
+              <label>{label}</label>
               <div className="toggle-group">
-                <button type="button" className={`toggle-btn ${formData[disease] === true ? 'active' : ''}`} onClick={() => setToggleValue(disease, true)}>Yes</button>
-                <button type="button" className={`toggle-btn ${formData[disease] === false ? 'active' : ''}`} onClick={() => setToggleValue(disease, false)}>No</button>
+                <button
+                  type="button"
+                  className={`toggle-btn ${formData[key] ? "active" : ""}`}
+                  onClick={() => setToggleValue(key, true)}
+                  aria-pressed={formData[key] === true}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  className={`toggle-btn ${!formData[key] ? "active" : ""}`}
+                  onClick={() => setToggleValue(key, false)}
+                  aria-pressed={formData[key] === false}
+                >
+                  No
+                </button>
               </div>
             </div>
           ))}
@@ -236,7 +258,7 @@ function HealthForm({ onSubmit, loading }) {
                 <option value="frequent">Frequent</option>
               </select>
             </div>
-            <div className="form-group" style={{display: 'flex', alignItems: 'flex-end', paddingBottom: '0.2rem'}}>
+            <div className="form-group form-group--checkbox">
               <div className="checkbox-group">
                 <label>
                   <input type="checkbox" name="smoking" checked={formData.smoking} onChange={handleChange} />
@@ -267,44 +289,39 @@ function HealthForm({ onSubmit, loading }) {
       {step === 4 && (
         <div className="form-section verification-section">
           <h3>Step 4: Verify Your Details</h3>
-          <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>
+          <p className="form-helper-text">
             Please review the data you've entered before generating your comprehensive report.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <div style={{ background: "var(--bg-subtle)", padding: "1rem", borderRadius: "var(--radius)" }}>
-              <h4 style={{ marginBottom: "0.5rem", color: "var(--primary)" }}>Basic Info</h4>
-              <p><strong>Age:</strong> {formData.age} years</p>
-              <p><strong>Weight:</strong> {formData.weight} kg</p>
-              <p><strong>Height:</strong> {formData.height} cm</p>
-              {bmiInfo && <p><strong>BMI:</strong> {bmiInfo.value} ({bmiInfo.category})</p>}
+          <div className="verification-grid">
+            <div className="verification-card">
+              <h4 className="verification-card-title">Basic Info</h4>
+              <p className="verification-row"><strong>Age:</strong> {formData.age} years</p>
+              <p className="verification-row"><strong>Weight:</strong> {formData.weight} kg</p>
+              <p className="verification-row"><strong>Height:</strong> {formData.height} cm</p>
+              {bmiValue && <p className="verification-row"><strong>BMI:</strong> {bmiValue} ({bmiCategory})</p>}
             </div>
 
-            <div style={{ background: "var(--bg-subtle)", padding: "1rem", borderRadius: "var(--radius)" }}>
-              <h4 style={{ marginBottom: "0.5rem", color: "var(--primary)" }}>Vitals & Medical History</h4>
-              <p><strong>Blood Pressure:</strong> {formData.systolic}/{formData.diastolic} mmHg</p>
-              <p><strong>Cholesterol:</strong> <span style={{ textTransform: "capitalize" }}>{formData.cholesterol}</span></p>
-              <p>
+            <div className="verification-card">
+              <h4 className="verification-card-title">Vitals & Medical History</h4>
+              <p className="verification-row"><strong>Blood Pressure:</strong> {formData.systolic}/{formData.diastolic} mmHg</p>
+              <p className="verification-row"><strong>Cholesterol:</strong> <span className="text-capitalize">{formData.cholesterol}</span></p>
+              <p className="verification-row">
                 <strong>Pre-existing Conditions:</strong>{" "}
-                {[
-                  formData.diabetes && "Diabetes",
-                  formData.hypertension && "Hypertension",
-                  formData.heartDisease && "Heart Disease",
-                  formData.kidneyDisease && "Kidney Disease"
-                ].filter(Boolean).join(", ") || "None"}
+                {selectedConditions.join(", ") || "None"}
               </p>
             </div>
 
-            <div style={{ background: "var(--bg-subtle)", padding: "1rem", borderRadius: "var(--radius)" }}>
-              <h4 style={{ marginBottom: "0.5rem", color: "var(--primary)" }}>Lifestyle & Environment</h4>
-              <p><strong>Location:</strong> <span style={{ textTransform: "capitalize" }}>{formData.location}</span></p>
-              <p><strong>Work Type:</strong> <span style={{ textTransform: "capitalize" }}>{formData.workType}</span></p>
-              <p><strong>Diet Type:</strong> <span style={{ textTransform: "capitalize" }}>{formData.dietType}</span></p>
-              <p><strong>Activity Level:</strong> <span style={{ textTransform: "capitalize" }}>{formData.activityLevel}</span></p>
-              <p><strong>Alcohol:</strong> <span style={{ textTransform: "capitalize" }}>{formData.alcoholConsumption}</span></p>
-              <p><strong>Smoker:</strong> {formData.smoking ? "Yes" : "No"}</p>
-              <p><strong>Water Intake:</strong> {formData.waterIntake} Liters/day</p>
-              <p><strong>Sleep Duration:</strong> {formData.sleepDuration} Hours/day</p>
+            <div className="verification-card">
+              <h4 className="verification-card-title">Lifestyle & Environment</h4>
+              <p className="verification-row"><strong>Location:</strong> <span className="text-capitalize">{toLabel(formData.location)}</span></p>
+              <p className="verification-row"><strong>Work Type:</strong> <span className="text-capitalize">{formData.workType}</span></p>
+              <p className="verification-row"><strong>Diet Type:</strong> <span className="text-capitalize">{toLabel(formData.dietType)}</span></p>
+              <p className="verification-row"><strong>Activity Level:</strong> <span className="text-capitalize">{formData.activityLevel}</span></p>
+              <p className="verification-row"><strong>Alcohol:</strong> <span className="text-capitalize">{formData.alcoholConsumption}</span></p>
+              <p className="verification-row"><strong>Smoker:</strong> {formData.smoking ? "Yes" : "No"}</p>
+              <p className="verification-row"><strong>Water Intake:</strong> {formData.waterIntake} Liters/day</p>
+              <p className="verification-row"><strong>Sleep Duration:</strong> {formData.sleepDuration} Hours/day</p>
             </div>
           </div>
         </div>
@@ -313,14 +330,14 @@ function HealthForm({ onSubmit, loading }) {
       {step === 5 && (
         <div className="form-section">
           <h3>Step 5: Ready for Analysis</h3>
-          <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>
+          <p className="form-helper-text">
             All your details have been collected and verified. 
             Click the button below to generate your comprehensive PranaPredict AI health report.
           </p>
-          <div style={{ padding: "2rem", textAlign: "center", background: "var(--bg-subtle)", borderRadius: "var(--radius)" }}>
-            <span style={{ fontSize: "3rem", display: "block", marginBottom: "1rem" }}>🩺</span>
+          <div className="analysis-ready-card">
+            <span className="analysis-ready-icon">🩺</span>
             <h4>Generate Your Health Forecast</h4>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: "0.5rem" }}>
+            <p className="analysis-ready-text">
               Our AI engine will analyze your inputs against modern medical parameters and Ayurvedic principles to build an exhaustive report.
             </p>
           </div>
@@ -333,13 +350,13 @@ function HealthForm({ onSubmit, loading }) {
             Back
           </button>
         )}
-        
-        {step < totalSteps ? (
-          <button type="button" className="submit-btn" onClick={handleNext} disabled={loading} style={{marginTop: 0}}>
+
+        {step < TOTAL_STEPS ? (
+          <button type="button" className="submit-btn" onClick={handleNext} disabled={loading}>
             Next Step
           </button>
         ) : (
-          <button type="submit" className="submit-btn" disabled={loading} style={{marginTop: 0}}>
+          <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? "Analyzing..." : "Predict Health Risk"}
           </button>
         )}

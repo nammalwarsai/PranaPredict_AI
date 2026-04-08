@@ -104,7 +104,10 @@ function Profile() {
   return (
     <div className="profile-page">
       <div className="profile-card">
-        <h1>Your Profile</h1>
+        <div className="profile-heading">
+          <h1>Your Profile</h1>
+          <p className="profile-subtitle">Manage your personal details and account information.</p>
+        </div>
 
         <ProfileForm
           key={formKey}
