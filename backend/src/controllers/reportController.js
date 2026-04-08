@@ -2,8 +2,32 @@ const { createAuthClient } = require("../config/supabaseClient");
 
 const PAGE_SIZE = 20;
 
-// Columns needed for the list view (llm_advice included for preview; excludes internal metadata)
-const LIST_COLUMNS = "id,user_id,age,bmi,blood_pressure,cholesterol,smoking,activity_level,risk_score,risk_level,llm_advice,created_at";
+// Columns needed for history cards and PDF generation.
+// Keep this in sync with fields inserted by predictionController.
+const LIST_COLUMNS = [
+  "id",
+  "user_id",
+  "age",
+  "bmi",
+  "blood_pressure",
+  "cholesterol",
+  "smoking",
+  "activity_level",
+  "diabetes",
+  "hypertension",
+  "heart_disease",
+  "kidney_disease",
+  "location",
+  "diet_type",
+  "water_intake",
+  "sleep_duration",
+  "alcohol_consumption",
+  "work_type",
+  "risk_score",
+  "risk_level",
+  "llm_advice",
+  "created_at",
+].join(",");
 
 async function getReports(req, res, next) {
   try {
