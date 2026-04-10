@@ -272,7 +272,7 @@ function drawCoverPage(ctx) {
   const pw = doc.getTextWidth("PRANA");
   setC(doc, C.white); doc.text("PREDICT AI", mx + pw + 2, by);
 
-  font(doc, T.small, "normal"); setC(doc, alpha(C.white, 0.45));
+  font(doc, T.small, "normal"); setC(doc, C.navy300);
   doc.text("AI-Powered Health Intelligence", mx, by + 7);
 
   // Divider line
@@ -283,18 +283,18 @@ function drawCoverPage(ctx) {
   doc.text("Health Risk", mx, by + 28);
   doc.text("Intelligence Report", mx, by + 38);
 
-  font(doc, 10, "normal"); setC(doc, alpha(C.white, 0.5));
+  font(doc, 10, "normal"); setC(doc, C.navy300);
   doc.text("Comprehensive Assessment & Personalized Action Plan", mx, by + 48);
 
-  // Metadata card — clean 4-column
+  // Metadata card — clean 4-column (dark translucent navy, not white)
   const my = by + 62;
   const mh = 42;
-  setF(doc, alpha(C.white, 0.06));
-  setS(doc, alpha(C.white, 0.1)); doc.setLineWidth(0.25);
+  setF(doc, mix(C.navy900, C.navy700, 0.3));
+  setS(doc, mix(C.navy600, C.navy400, 0.3)); doc.setLineWidth(0.25);
   rr(doc, mx, my, W - mx * 2, mh, 4, "FD");
 
   const colW = (W - mx * 2) / 4;
-  setS(doc, alpha(C.white, 0.07)); doc.setLineWidth(0.15);
+  setS(doc, mix(C.navy600, C.navy400, 0.4)); doc.setLineWidth(0.15);
   for (let i = 1; i < 4; i++) doc.line(mx + colW * i, my + 6, mx + colW * i, my + mh - 6);
 
   const meta = [
@@ -312,8 +312,8 @@ function drawCoverPage(ctx) {
 
   // Bottom info
   const bby = H - 30;
-  setS(doc, alpha(C.white, 0.1)); doc.setLineWidth(0.15); doc.line(mx, bby, W - mx, bby);
-  font(doc, T.tiny, "normal"); setC(doc, alpha(C.white, 0.25));
+  setS(doc, C.navy400); doc.setLineWidth(0.15); doc.line(mx, bby, W - mx, bby);
+  font(doc, T.tiny, "normal"); setC(doc, C.navy300);
   doc.text("CONFIDENTIAL HEALTH DOCUMENT", mx, bby + 6);
   doc.text(fmtDateTime(ctx.report.created_at), W - mx, bby + 6, { align: "right" });
 }
