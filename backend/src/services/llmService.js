@@ -10,11 +10,19 @@ function buildPrompt(healthData, riskResult) {
     location, dietType, alcoholConsumption, waterIntake, sleepDuration, workType,
     diabetes, hypertension, heartDisease, kidneyDisease
   } = healthData;
-  const { score, level } = riskResult;
+  const { score, level, breakdown } = riskResult;
 
-  return `You are PranaPredict AI, a health wellness advisor inspired by Ayurveda and modern preventive medicine. Analyze the following health data and provide personalized, actionable advice.
+  // Build breakdown explanation for the LLM
+  const breakdownText = breakdown ? [
+    `  - Pre-existing Conditions: ${breakdown.conditions.pct}% contribution (${breakdown.conditions.details.join(", ") || "None"})`,
+    `  - Vitals (BMI/BP/Cholesterol): ${breakdown.vitals.pct}% contribution (${breakdown.vitals.details.join(", ")})`,
+    `  - Lifestyle Factors: ${breakdown.lifestyle.pct}% contribution (${breakdown.lifestyle.details.join(", ") || "None"})`,
+    `  - Age Factor: ${breakdown.age.pct}% contribution (${breakdown.age.details.join(", ")})`,
+  ].join("\n") : "Breakdown not available.";
 
-Patient Health Data:
+  return `You are PranaPredict AI, a health wellness advisor combining modern preventive medicine with Ayurvedic wisdom. Generate a structured health report for the following patient data.
+
+PATIENT HEALTH DATA:
 - Age: ${age}
 - BMI: ${bmi}
 - Blood Pressure: ${bloodPressure || "N/A"}
@@ -28,17 +36,64 @@ Patient Health Data:
 - Pre-existing Conditions: ${[diabetes && 'Diabetes', hypertension && 'Hypertension', heartDisease && 'Heart Disease', kidneyDisease && 'Kidney Disease'].filter(Boolean).join(', ') || 'None'}
 - Risk Score: ${score}/100 (${level} Risk)
 
-Provide a highly comprehensive and exhaustively detailed health assessment. The report MUST CONSTITUTE NO LESS THAN 150 LINES of detailed text.
+RISK FACTOR BREAKDOWN (explain these percentages in your analysis):
+${breakdownText}
 
-Format the response strictly using markdown outlines and deep paragraphs covering the following mandatory sections:
-1. **Executive Risk Summary**: Extremely thorough analysis of their overall risk level.
-2. **Key Predictive Concerns**: In-depth medical elaboration on at least 4 specific health concerns derived directly from their data points (BP, BMI, habits, history). Explain the biochemical and physiological reasons.
-3. **Ayurvedic Insights**: Detailed Ayurvedic assessment (Dosha balancing) corresponding to their attributes, mentioning herbs, lifestyle, and philosophy.
-4. **Extensive Recommendations**: 10-15 deep, actionable lifestyle changes (diet, daily routine, mental health, exercise). Provide specific scientifically backed reasons.
-5. **Pathological Risk Forecast**: What their long-term health trajectory looks like if habits aren't changed.
-6. **Encouraging Observation**: Expand on the positives in their profile deeply.
+CRITICAL INSTRUCTIONS — USE EXACTLY THESE SECTION HEADINGS:
 
-CRITICAL REQUIREMENT: Do not summarize. You must write an extensive, highly informative essay covering every possible angle. Ensure the output is visually long using paragraphs and lists, guaranteed exceeding 150 lines.`;
+## Top 3 Immediate Health Risks
+List the top 3 most urgent health risks for this patient, ordered by priority. For each risk use EXACTLY this format:
+- **Risk Name**: [name]
+- **Severity**: [Critical/High/Moderate/Low]
+- **Why**: [1-2 sentence explanation tied to their data]
+- **Immediate Action**: [specific action to take]
+
+## Key Health Concerns
+For each concern (cover at least 4), use this EXACT Cause → Impact → Fix format:
+- **Concern**: [name]
+- **Cause**: [specific cause from their data, e.g., "Junk-heavy diet with only 1.5L water/day"]
+- **Impact**: [physiological impact, e.g., "Leads to chronic dehydration and insulin resistance"]
+- **Fix**: [specific actionable fix, e.g., "Switch to low-GI foods, increase water to 3L/day"]
+
+## Personalized Daily Targets
+Provide SPECIFIC numbers personalized to this patient:
+- Daily steps target
+- Daily calorie range
+- Daily water intake target (liters)
+- Sleep window (e.g., "10:30 PM – 6:30 AM")
+- Exercise type and duration
+- Key foods to add / avoid
+
+## 30-Day Action Plan
+Structure as 4 weeks:
+- **Week 1**: [Focus area + specific daily actions]
+- **Week 2**: [Focus area + specific daily actions]
+- **Week 3**: [Focus area + specific daily actions]
+- **Week 4**: [Focus area + specific daily actions]
+
+## Ayurvedic & Holistic Insights
+Integrate Ayurvedic analysis WITH modern medicine correlations:
+- Identify likely dosha imbalance based on their data
+- Connect it to their modern medical concerns (e.g., "Junk diet → Pitta aggravation → inflammatory markers")
+- Recommend specific herbs, routines, and practices
+- Keep this integrated with the medical analysis, not separate
+
+## Positive Observations
+Highlight 2-3 genuinely positive aspects of their health profile with encouragement.
+
+## Next Steps
+Provide 3 clear, urgent next steps:
+1. Medical consultation recommendation with timeline
+2. When to re-evaluate (e.g., "Re-assess in 60 days")
+3. Most important single change to make TODAY
+
+FORMATTING RULES:
+- Use bullet points and short paragraphs, NOT dense essays
+- Be specific with numbers: exact calories, exact steps, exact sleep times
+- Reference their actual data in every recommendation
+- Each section must be substantial (at least 8-10 lines)
+- Total output must be at least 120 lines
+- Do NOT repeat the risk score multiple times — mention it ONCE in the opening`;
 }
 
 async function generateHealthAdvice(healthData, riskResult) {
@@ -62,7 +117,7 @@ async function generateHealthAdvice(healthData, riskResult) {
           content: prompt,
         },
       ],
-      max_tokens: 2800,
+      max_tokens: 3500,
       temperature: 0.7,
       top_p: 0.95,
     });

@@ -95,6 +95,7 @@ async function predict(req, res, next) {
       healthData,
       riskScore: riskResult.score,
       riskLevel: riskResult.level,
+      riskBreakdown: riskResult.breakdown,
       advice: llmResult.advice,
       model: llmResult.model,
       createdAt: report?.created_at,
