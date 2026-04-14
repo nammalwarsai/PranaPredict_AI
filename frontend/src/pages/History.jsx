@@ -4,12 +4,12 @@ import { getReports } from "../api/api";
 import TrendCharts from "../components/TrendCharts";
 import { generateHealthReportPdf } from "../utils/pdfReportGenerator";
 
-function getRiskColor(level) {
+function getRiskTone(level) {
   switch (level) {
-    case "Low": return "#22c55e";
-    case "Moderate": return "#f59e0b";
-    case "High": return "#ef4444";
-    default: return "#6b7280";
+    case "Low": return "low";
+    case "Moderate": return "moderate";
+    case "High": return "high";
+    default: return "unknown";
   }
 }
 
@@ -85,30 +85,53 @@ function History() {
   }, []);
 
   const pageHeader = (
-    <div className="page-head">
-      <div>
+    <div className="page-head history-page-head">
+      <div className="history-head-copy">
         <h1 className="page-title">Health Report History</h1>
         <p className="page-subtitle">Track your historical assessments, monitor trend movement, and export any report as PDF.</p>
+      </div>
+      <div className="history-head-pill">
+        {reports.length} Report{reports.length === 1 ? "" : "s"}
       </div>
     </div>
   );
 
   if (loading) {
     return (
-      <div className="history-page">
+      <div className="history-page history-page-modern">
         {pageHeader}
-        <p className="loading-text">Loading your reports...</p>
+        <div className="history-loading-card">
+          <p className="loading-text">Loading your reports...</p>
+        </div>
       </div>
     );
   }
 
   const totalPages = pagination?.totalPages ?? 1;
+  const averageScore = reports.length
+    ? Math.round(reports.reduce((sum, report) => sum + Number(report.risk_score || 0), 0) / reports.length)
+    : 0;
 
   return (
-    <div className="history-page">
+    <div className="history-page history-page-modern">
       {pageHeader}
 
-      {error && <div className="error-message">{error}</div>}
+      <div className="history-stats-grid">
+        <div className="history-stat-card">
+          <span className="history-stat-label">Reports on this page</span>
+          <strong className="history-stat-value">{reports.length}</strong>
+        </div>
+        <div className="history-stat-card">
+          <span className="history-stat-label">Average risk score</span>
+          <strong className="history-stat-value">{averageScore}/100</strong>
+        </div>
+        <div className="history-stat-card">
+          <span className="history-stat-label">Current page</span>
+          <strong className="history-stat-value">{page} / {totalPages}</strong>
+        </div>
+      </div>
+
+      {error && <div className="error-message history-error">{error}</div>}
 
       {reports.length === 0 && !error ? (
         <div className="empty-state">
@@ -124,8 +147,7 @@ function History() {
             <div key={report.id} className="report-card">
               <div className="report-card-header">
                 <span
-                  className="report-risk-badge"
-                  style={{ backgroundColor: getRiskColor(report.risk_level) }}
+                  className={`report-risk-badge report-risk-badge--${getRiskTone(report.risk_level)}`}
                 >
                   {report.risk_level} Risk
                 </span>
@@ -135,7 +157,7 @@ function History() {
               </div>
               <div className="report-card-body">
                 <div className="report-score">
-                  Score: <strong>{report.risk_score}</strong>/100
+                  Risk Score <strong>{report.risk_score}</strong>/100
                 </div>
                 <div className="report-details-row">
                   <span>Age: {report.age}</span>
