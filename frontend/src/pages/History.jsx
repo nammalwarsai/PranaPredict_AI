@@ -33,16 +33,20 @@ function History() {
 
   useEffect(() => {
     let active = true;
+    let safetyTimer;
 
     async function fetchReports() {
       setLoading(true);
+      setError(null);
       try {
         const response = await getReports(page);
         if (!active) return;
+        clearTimeout(safetyTimer);
         setReports(response.data.data || []);
         setPagination(response.data.pagination || null);
       } catch (err) {
         if (!active) return;
+        clearTimeout(safetyTimer);
         if (err.code === "ECONNABORTED") {
           setError("Loading reports timed out. Please try again.");
         } else {
@@ -53,7 +57,7 @@ function History() {
       }
     }
 
-    const safetyTimer = setTimeout(() => {
+    safetyTimer = setTimeout(() => {
       if (!active) return;
       setError("Loading reports timed out. Please try again.");
       setLoading(false);

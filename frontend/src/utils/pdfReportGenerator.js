@@ -165,14 +165,6 @@ function parseAdviceSections(advice) {
   return { sections, sectionOrder };
 }
 
-function parseListItems(text) {
-  return String(text || "").split(/\r?\n/)
-    .map(l => l.trim())
-    .filter(l => l && !l.startsWith("#"))
-    .map(l => stripMd(l.replace(/^[-*•]\s*/, "").replace(/^\d+\.\s*/, "")))
-    .filter(Boolean);
-}
-
 // ─── Compute approximate breakdown from report data (for old reports) ───────────
 function computeBreakdown(report) {
   if (report.riskBreakdown) return report.riskBreakdown;
@@ -684,7 +676,7 @@ function drawAdvice(ctx) {
       if (!stripped) continue;
 
       // Bold field detection (e.g., "- **Risk Name**: value")
-      const boldField = /^\-?\s*\*\*(.+?)\*\*:\s*(.+)$/.exec(line);
+      const boldField = /^-?\s*\*\*(.+?)\*\*:\s*(.+)$/.exec(line);
       if (boldField) {
         const label = stripMd(boldField[1]);
         const value = stripMd(boldField[2]);

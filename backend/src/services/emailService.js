@@ -40,6 +40,15 @@ const BRAND = {
   border: "#E5E7EB",
 };
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function baseLayout(title, preheader, bodyContent) {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -103,10 +112,13 @@ function riskColor(level) {
 function buildPredictionEmail(userName, data) {
   const { healthData, riskScore, riskLevel, advice } = data;
   const color = riskColor(riskLevel);
-  const name = userName || "there";
+  const name = escapeHtml(userName || "there");
 
   // Convert markdown-style bold (**text**) to HTML <strong>
   const formattedAdvice = (advice || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\n/g, "<br>");
 
@@ -195,7 +207,7 @@ function buildPredictionEmail(userName, data) {
 
 // ── 2. Login Confirmation Email ───────────────────────────────────────
 function buildLoginEmail(userName) {
-  const name = userName || "there";
+  const name = escapeHtml(userName || "there");
   const timestamp = new Date().toLocaleString("en-IN", {
     dateStyle: "full",
     timeStyle: "short",
@@ -258,7 +270,7 @@ function buildLoginEmail(userName) {
 
 // ── 3. Logout Confirmation Email ──────────────────────────────────────
 function buildLogoutEmail(userName) {
-  const name = userName || "there";
+  const name = escapeHtml(userName || "there");
   const timestamp = new Date().toLocaleString("en-IN", {
     dateStyle: "full",
     timeStyle: "short",

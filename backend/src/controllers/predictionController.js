@@ -33,7 +33,7 @@ async function predict(req, res, next) {
     // Validate input
     const parseResult = predictSchema.safeParse(req.body);
     if (!parseResult.success) {
-      const messages = parseResult.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`);
+      const messages = parseResult.error.issues.map((e) => `${e.path.join(".")}: ${e.message}`);
       return res.status(400).json({ success: false, error: "Validation failed", details: messages });
     }
 

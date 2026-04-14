@@ -23,7 +23,7 @@ function Landing() {
               <Link to="/dashboard" className="btn-primary">Go to Dashboard</Link>
             ) : (
               <>
-                <Link to="/login" className="btn-primary">Get Started</Link>
+                <Link to="/login" className="btn-primary landing-hero-btn">Get Started</Link>
                 <Link to="/signup" className="btn-outline">Create Account</Link>
               </>
             )}

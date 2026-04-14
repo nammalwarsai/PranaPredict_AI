@@ -755,6 +755,16 @@ input[type="range"]::-webkit-slider-thumb {
   max-width: 56ch;
 }
 
+.landing-hero-btn {
+  background: #ffffff;
+  color: var(--brand-600);
+}
+
+.landing-hero-btn:hover {
+  background: #f0f9ff;
+  color: var(--brand-600);
+}
+
 .hero-kpis {
   margin-top: var(--space-6);
   display: flex;
