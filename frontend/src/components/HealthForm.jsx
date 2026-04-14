@@ -17,6 +17,7 @@ function toLabel(value) {
 
 function HealthForm({ onSubmit, loading }) {
   const [step, setStep] = useState(1);
+  const [finalConfirmed, setFinalConfirmed] = useState(false);
 
   const [formData, setFormData] = useState({
     // Step 1: Basic Info
@@ -73,13 +74,24 @@ function HealthForm({ onSubmit, loading }) {
     setFormData(newData);
   };
 
-  const handleNext = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1));
+  const handleNext = () => {
+    setStep((s) => {
+      const nextStep = Math.min(TOTAL_STEPS, s + 1);
+      if (nextStep === TOTAL_STEPS) {
+        setFinalConfirmed(false);
+      }
+      return nextStep;
+    });
+  };
   const handleBack = () => setStep((s) => Math.max(1, s - 1));
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (step !== TOTAL_STEPS) {
       handleNext();
+      return;
+    }
+    if (!finalConfirmed) {
       return;
     }
 
@@ -341,6 +353,19 @@ function HealthForm({ onSubmit, loading }) {
               Our AI engine will analyze your inputs against modern medical parameters and Ayurvedic principles to build an exhaustive report.
             </p>
           </div>
+          <div className="form-group form-group--checkbox">
+            <div className="checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="finalConfirmation"
+                  checked={finalConfirmed}
+                  onChange={(e) => setFinalConfirmed(e.target.checked)}
+                />
+                I confirm that all details are correct and I want to generate my final report.
+              </label>
+            </div>
+          </div>
         </div>
       )}
 
@@ -356,7 +381,7 @@ function HealthForm({ onSubmit, loading }) {
             Next Step
           </button>
         ) : (
-          <button type="submit" className="submit-btn" disabled={loading}>
+          <button type="submit" className="submit-btn" disabled={loading || !finalConfirmed}>
             {loading ? "Analyzing..." : "Predict Health Risk"}
           </button>
         )}
