@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { calculateBMI, getBMICategory } from "../utils/bmiCalculator";
 import "./HealthForm.css";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 const CONDITION_FIELDS = [
   { key: "diabetes", label: "Diabetes" },
@@ -77,7 +77,7 @@ function HealthForm({ onSubmit, loading }) {
   const handleNext = () => {
     setStep((s) => {
       const nextStep = Math.min(TOTAL_STEPS, s + 1);
-      if (nextStep === TOTAL_STEPS) {
+      if (nextStep === 5) {
         setFinalConfirmed(false);
       }
       return nextStep;
@@ -122,7 +122,7 @@ function HealthForm({ onSubmit, loading }) {
       <h2>Health Assessment</h2>
 
       <div className="health-form-progress">
-        {[1, 2, 3, 4, 5].map((s) => (
+        {[1, 2, 3, 4, 5, 6].map((s) => (
           <div key={s} className={`step-indicator ${step === s ? "active" : ""} ${step > s ? "completed" : ""}`}>
             {s}
           </div>
@@ -341,16 +341,15 @@ function HealthForm({ onSubmit, loading }) {
 
       {step === 5 && (
         <div className="form-section">
-          <h3>Step 5: Ready for Analysis</h3>
+          <h3>Step 5: Final Confirmation</h3>
           <p className="form-helper-text">
-            All your details have been collected and verified. 
-            Click the button below to generate your comprehensive PranaPredict AI health report.
+            Please confirm your details once more before moving to the final submission step.
           </p>
           <div className="analysis-ready-card">
             <span className="analysis-ready-icon">🩺</span>
-            <h4>Generate Your Health Forecast</h4>
+            <h4>Confirmation Required</h4>
             <p className="analysis-ready-text">
-              Our AI engine will analyze your inputs against modern medical parameters and Ayurvedic principles to build an exhaustive report.
+              The system will only allow submission after you confirm below and proceed to Step 6.
             </p>
           </div>
           <div className="form-group form-group--checkbox">
@@ -369,6 +368,22 @@ function HealthForm({ onSubmit, loading }) {
         </div>
       )}
 
+      {step === 6 && (
+        <div className="form-section">
+          <h3>Step 6: Submit for Analysis</h3>
+          <p className="form-helper-text">
+            You're all set. Click submit to generate your comprehensive PranaPredict AI health report.
+          </p>
+          <div className="analysis-ready-card">
+            <span className="analysis-ready-icon">✅</span>
+            <h4>Ready to Analyze</h4>
+            <p className="analysis-ready-text">
+              Your inputs are confirmed. Submission starts only when you click the final Predict button.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="form-actions">
         {step > 1 && (
           <button type="button" className="btn-secondary" onClick={handleBack} disabled={loading}>
@@ -377,8 +392,13 @@ function HealthForm({ onSubmit, loading }) {
         )}
 
         {step < TOTAL_STEPS ? (
-          <button type="button" className="submit-btn" onClick={handleNext} disabled={loading}>
-            Next Step
+          <button
+            type="button"
+            className="submit-btn"
+            onClick={handleNext}
+            disabled={loading || (step === 5 && !finalConfirmed)}
+          >
+            {step === 5 ? "Continue to Final Step" : "Next Step"}
           </button>
         ) : (
           <button type="submit" className="submit-btn" disabled={loading || !finalConfirmed}>
