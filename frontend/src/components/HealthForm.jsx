@@ -370,17 +370,11 @@ function HealthForm({ onSubmit, loading }) {
 
       {step === 6 && (
         <div className="form-section">
-          <h3>Step 6: Submit for Analysis</h3>
+          <h3>Step 6: Generating your report...</h3>
           <p className="form-helper-text">
-            You're all set. Click submit to generate your comprehensive PranaPredict AI health report.
+            Please wait while we generate your report...
           </p>
-          <div className="analysis-ready-card">
-            <span className="analysis-ready-icon">✅</span>
-            <h4>Ready to Analyze</h4>
-            <p className="analysis-ready-text">
-              Your inputs are confirmed. Submission starts only when you click the final Predict button.
-            </p>
-          </div>
+          
         </div>
       )}
 
