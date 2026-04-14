@@ -27,6 +27,7 @@ const MoonIcon = () => (
 const AUTH_LINKS = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/history", label: "History" },
+  { to: "/analytics", label: "Analytics" },
   { to: "/health-tips", label: "Health Tips" },
   { to: "/profile", label: "Profile" },
 ];

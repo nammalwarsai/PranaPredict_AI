@@ -12,6 +12,7 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Report from "./pages/Report";
 import HealthTips from "./pages/HealthTips";
+import Analytics from "./pages/Analytics";
 import "./App.css";
 import "./styles/design-system.css";
 
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+                <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
                 <Route path="/health-tips" element={<ProtectedRoute><HealthTips /></ProtectedRoute>} />
