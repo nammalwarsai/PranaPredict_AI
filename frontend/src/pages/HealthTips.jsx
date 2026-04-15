@@ -337,6 +337,11 @@ function HealthTips() {
 
   const bracket = useMemo(() => (age ? getBracket(Number(age)) : null), [age]);
   const data = bracket ? TIPS_DATA[bracket] : null;
+  const currentCategory = data ? data.categories[activeCategory] : null;
+  const totalTips = data
+    ? data.categories.reduce((sum, category) => sum + category.tips.length, 0)
+    : 0;
+  const featuredTip = currentCategory ? currentCategory.tips[0] : "";
 
   const handleAgeChange = (e) => {
     const val = e.target.value;
@@ -350,12 +355,27 @@ function HealthTips() {
     <div className="ht-page">
       {/* Header */}
       <div className="ht-header">
+        <div className="ht-header-chip">AI + Ayurveda Personalised Engine</div>
         <span className="ht-header-icon">🌿</span>
-        <h1 className="ht-title">Health &amp; Wellness Tips</h1>
+        <h1 className="ht-title">Health &amp; Wellness Intelligence Hub</h1>
         <p className="ht-subtitle">
-          Personalised guidance blending modern medicine with ancient Indian
-          Ayurveda — tailored to your age
+          Detailed, age-specific guidance blending preventive medicine, daily
+          routines, and traditional Indian wellness principles.
         </p>
+        <div className="ht-header-kpis">
+          <div className="ht-kpi-card">
+            <span className="ht-kpi-label">Age Brackets</span>
+            <strong className="ht-kpi-value">5</strong>
+          </div>
+          <div className="ht-kpi-card">
+            <span className="ht-kpi-label">Health Domains</span>
+            <strong className="ht-kpi-value">5</strong>
+          </div>
+          <div className="ht-kpi-card">
+            <span className="ht-kpi-label">Actionable Tips</span>
+            <strong className="ht-kpi-value">125+</strong>
+          </div>
+        </div>
       </div>
 
       {/* Age Input */}
@@ -399,6 +419,23 @@ function HealthTips() {
             <span className="ht-bracket-age">{bracket} yrs</span>
           </div>
 
+          <div className="ht-insight-rail">
+            <div className="ht-insight-card">
+              <span className="ht-insight-label">Selected Category</span>
+              <strong className="ht-insight-value">
+                {currentCategory?.icon} {currentCategory?.name}
+              </strong>
+            </div>
+            <div className="ht-insight-card">
+              <span className="ht-insight-label">Tips in Category</span>
+              <strong className="ht-insight-value">{currentCategory?.tips.length}</strong>
+            </div>
+            <div className="ht-insight-card">
+              <span className="ht-insight-label">Total for Age Group</span>
+              <strong className="ht-insight-value">{totalTips}</strong>
+            </div>
+          </div>
+
           {/* Category tabs */}
           <div className="ht-tabs">
             {data.categories.map((cat, idx) => (
@@ -416,6 +453,11 @@ function HealthTips() {
                 {cat.name}
               </button>
             ))}
+          </div>
+
+          <div className="ht-featured-tip" style={{ "--ht-accent": data.color }}>
+            <span className="ht-featured-chip">Featured Insight</span>
+            <p>{featuredTip}</p>
           </div>
 
           {/* Active tips list */}

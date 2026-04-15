@@ -1095,11 +1095,79 @@ input[type="range"]::-webkit-slider-thumb {
   font-size: clamp(1.45rem, 2.8vw, 2rem);
 }
 
+.ht-page {
+  position: relative;
+}
+
+.ht-page::before {
+  content: "";
+  position: absolute;
+  inset: -24px -20px auto;
+  height: 240px;
+  background:
+    radial-gradient(circle at 15% 35%, color-mix(in srgb, var(--brand-400) 28%, transparent), transparent 54%),
+    radial-gradient(circle at 84% 30%, color-mix(in srgb, var(--info-500) 22%, transparent), transparent 58%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 .ht-subtitle,
 .ht-input-hint,
 .ht-bracket-sub,
 .ht-all-card-count {
   color: var(--text-500);
+}
+
+.ht-header {
+  text-align: center;
+  padding: clamp(1.2rem, 3vw, 1.9rem);
+  border: 1px solid var(--surface-200);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface-0) 90%, var(--brand-50) 10%), var(--surface-0));
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.ht-header-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--brand-400) 26%, var(--surface-200));
+  color: var(--brand-700);
+  background: color-mix(in srgb, var(--brand-50) 65%, var(--surface-0));
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ht-header-kpis {
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.ht-kpi-card {
+  border: 1px solid var(--surface-200);
+  background: var(--surface-0);
+  border-radius: var(--radius-md);
+  padding: 0.72rem 0.8rem;
+}
+
+.ht-kpi-label {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--text-500);
+}
+
+.ht-kpi-value {
+  margin-top: 0.18rem;
+  font-size: 1.2rem;
+  color: var(--text-900);
 }
 
 .ht-input-card,
@@ -1108,12 +1176,86 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: var(--radius-md);
 }
 
+.ht-input-card {
+  border: 1px solid var(--surface-200);
+  background: var(--surface-0);
+}
+
+.ht-bracket-banner {
+  border-width: 1px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--surface-0) 88%, transparent), var(--surface-0));
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.ht-insight-rail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.ht-insight-card {
+  border: 1px solid var(--surface-200);
+  border-radius: var(--radius-md);
+  background: var(--surface-0);
+  padding: 0.72rem 0.9rem;
+}
+
+.ht-insight-label {
+  display: block;
+  color: var(--text-500);
+  font-size: 0.75rem;
+}
+
+.ht-insight-value {
+  color: var(--text-900);
+  font-size: 1.02rem;
+}
+
 .ht-tab {
   border-radius: 999px;
+  border-color: var(--surface-300);
+}
+
+.ht-tabs {
+  margin-bottom: var(--space-4);
+}
+
+.ht-featured-tip {
+  border: 1px solid color-mix(in srgb, var(--ht-accent, var(--brand-500)) 28%, var(--surface-200));
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--ht-accent, var(--brand-500)) 12%, var(--surface-0)), var(--surface-0));
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  margin-bottom: var(--space-4);
+}
+
+.ht-featured-chip {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.18rem 0.58rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #fff;
+  background: var(--ht-accent, var(--brand-500));
+  margin-bottom: 0.45rem;
+}
+
+.ht-featured-tip p {
+  margin: 0;
+  color: var(--text-700);
+  line-height: 1.6;
 }
 
 .ht-all-card {
   border-radius: var(--radius-sm);
+  border-color: var(--surface-300);
+}
+
+.ht-all-card:hover {
+  transform: translateY(-2px);
 }
 
 .ht-tip-text {
@@ -1222,6 +1364,11 @@ input[type="range"]::-webkit-slider-thumb {
 
   .ht-all-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ht-header-kpis,
+  .ht-insight-rail {
+    grid-template-columns: 1fr;
   }
 }
 
