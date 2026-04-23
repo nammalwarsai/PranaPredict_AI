@@ -96,7 +96,7 @@ function HealthForm({ onSubmit, loading }) {
     }
 
     const payload = {
-      age: Number.parseInt(formData.age, 10),
+      age: formData.age,
       bmi: bmiValue,
       bloodPressure: `${formData.systolic}/${formData.diastolic}`,
       cholesterol: formData.cholesterol,
@@ -106,8 +106,8 @@ function HealthForm({ onSubmit, loading }) {
       kidneyDisease: formData.kidneyDisease,
       location: formData.location,
       dietType: formData.dietType,
-      waterIntake: parseFloat(formData.waterIntake),
-      sleepDuration: parseFloat(formData.sleepDuration),
+      waterIntake: formData.waterIntake,
+      sleepDuration: formData.sleepDuration,
       alcoholConsumption: formData.alcoholConsumption,
       workType: formData.workType,
       activityLevel: formData.activityLevel,

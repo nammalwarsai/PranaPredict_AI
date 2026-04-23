@@ -71,12 +71,14 @@ export const submitPrediction = (healthData) => {
 // Reports
 export const getReports = (page = 1) => API.get("/api/reports", { params: { page } });
 export const getReportById = (id) => API.get(`/api/reports/${id}`);
+const MAX_PAGES = 50;
+
 export const getAllReports = async () => {
   const all = [];
   let page = 1;
   let totalPages = 1;
 
-  while (page <= totalPages) {
+  while (page <= totalPages && page <= MAX_PAGES) {
     const response = await getReports(page);
     const pageData = response.data?.data || [];
     const pageMeta = response.data?.pagination || {};

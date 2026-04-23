@@ -90,9 +90,11 @@ function History() {
         <h1 className="page-title">Health Report History</h1>
         <p className="page-subtitle">Track your historical assessments, monitor trend movement, and export any report as PDF.</p>
       </div>
-      <div className="history-head-pill">
-        {reports.length} Report{reports.length === 1 ? "" : "s"}
-      </div>
+      {!loading && (
+        <div className="history-head-pill">
+          {reports.length} Report{reports.length === 1 ? "" : "s"}
+        </div>
+      )}
     </div>
   );
 

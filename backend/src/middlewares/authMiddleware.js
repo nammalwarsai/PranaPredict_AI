@@ -11,7 +11,7 @@ setInterval(() => {
   for (const [key, entry] of tokenCache) {
     if (now > entry.expiresAt) tokenCache.delete(key);
   }
-}, CACHE_TTL_MS);
+}, CACHE_TTL_MS).unref();
 
 function withTimeout(promise, timeoutMs) {
   return Promise.race([

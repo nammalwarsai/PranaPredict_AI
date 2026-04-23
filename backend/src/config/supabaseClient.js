@@ -41,7 +41,12 @@ function createAuthClient(accessToken) {
 
   _authClientCache.set(accessToken, { client, expiresAt: now + AUTH_CLIENT_TTL_MS });
 
-  // Prevent unbounded growth: evict oldest entry when over the limit
+  // Evict expired entries first, then trim to limit if still over
+  if (_authClientCache.size > AUTH_CLIENT_MAX) {
+    for (const [key, entry] of _authClientCache) {
+      if (now >= entry.expiresAt) _authClientCache.delete(key);
+    }
+  }
   if (_authClientCache.size > AUTH_CLIENT_MAX) {
     const firstKey = _authClientCache.keys().next().value;
     _authClientCache.delete(firstKey);
