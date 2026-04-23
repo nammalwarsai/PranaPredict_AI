@@ -10,7 +10,7 @@ async function sendLoginNotification(req, res) {
     }
 
     // Fire-and-forget — don't block the response
-    sendLoginEmail(email, name);
+    sendLoginEmail(email, name).catch(() => {});
 
     res.json({ success: true, message: "Login notification email queued" });
   } catch (error) {
@@ -29,7 +29,7 @@ async function sendLogoutNotification(req, res) {
     }
 
     // Fire-and-forget — don't block the response
-    sendLogoutEmail(email, name);
+    sendLogoutEmail(email, name).catch(() => {});
 
     res.json({ success: true, message: "Logout notification email queued" });
   } catch (error) {

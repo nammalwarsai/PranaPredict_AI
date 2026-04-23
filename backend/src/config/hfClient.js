@@ -11,7 +11,7 @@ let _client = null;
 function getClient() {
   if (_client) return _client;
   const apiKey = process.env.HUGGINGFACE_API_KEY;
-  if (!apiKey || apiKey === "your_huggingface_api_key_here") {
+  if (!apiKey || apiKey.startsWith("your_huggingface")) {
     return null;
   }
   _client = axios.create({

@@ -15,10 +15,10 @@ function Login() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error: signInError } = await signIn(email, password);
     setLoading(false);
-    if (error) {
-      setError(error.message);
+    if (signInError) {
+      setError(signInError.message);
     } else {
       // Fire-and-forget login notification email
       sendLoginNotification().catch(() => {});

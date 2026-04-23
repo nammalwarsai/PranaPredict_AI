@@ -37,7 +37,7 @@ function RiskResult({ result }) {
 
   const riskColor = getRiskColor(riskLevel);
 
-  if (!result) return null;
+  if (!result || !healthData) return null;
 
   return (
     <div className="risk-result">

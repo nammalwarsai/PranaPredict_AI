@@ -3,8 +3,12 @@ import { createContext, useContext, useState, useEffect } from "react";
 const ThemeContext = createContext();
 
 function getInitialTheme() {
-    const stored = localStorage.getItem("prana-theme");
-    if (stored === "dark" || stored === "light") return stored;
+    try {
+        const stored = localStorage.getItem("prana-theme");
+        if (stored === "dark" || stored === "light") return stored;
+    } catch {
+        // localStorage unavailable (sandboxed iframe, etc.)
+    }
     if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) return "dark";
     return "light";
 }
@@ -14,7 +18,7 @@ export function ThemeProvider({ children }) {
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("prana-theme", theme);
+        try { localStorage.setItem("prana-theme", theme); } catch { /* noop */ }
     }, [theme]);
 
     const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));

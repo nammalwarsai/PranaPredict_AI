@@ -121,7 +121,7 @@ function Analytics() {
   const gridColor = isDark ? "#334155" : "#e2e8f0";
   const lineColor = "#2563eb";
 
-  const lineData = {
+  const lineData = useMemo(() => ({
     labels,
     datasets: [
       {
@@ -136,9 +136,9 @@ function Analytics() {
         fill: true,
       },
     ],
-  };
+  }), [labels, values, selectedField.label, isDark, lineColor]);
 
-  const barData = {
+  const barData = useMemo(() => ({
     labels,
     datasets: [
       {
@@ -149,9 +149,9 @@ function Analytics() {
         maxBarThickness: 32,
       },
     ],
-  };
+  }), [labels, values, selectedField.label]);
 
-  const chartOptions = {
+  const chartOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -168,7 +168,7 @@ function Analytics() {
         grid: { display: false },
       },
     },
-  };
+  }), [isDark, axisText, gridColor]);
 
   return (
     <div className="analytics-page">
