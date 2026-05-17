@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import HealthForm from "../components/HealthForm";
 import RiskResult from "../components/RiskResult";
 import { submitPrediction } from "../api/api";
@@ -8,7 +8,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (healthData) => {
+  const handleSubmit = useCallback(async (healthData) => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -20,7 +20,7 @@ function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return (
     <div className="dashboard">

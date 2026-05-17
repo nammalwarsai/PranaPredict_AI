@@ -2,16 +2,18 @@ const supabase = require("../config/supabaseClient");
 
 // In-memory token cache: token -> { user, expiresAt }
 const tokenCache = new Map();
-const CACHE_TTL_MS = 15 * 1000; // 15 seconds — short to limit stale token exposure
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds — balances freshness vs. Supabase calls
 const AUTH_TIMEOUT_MS = 3000;
+const MAX_CACHE_SIZE = 500;
 
-// Periodically evict expired entries so the Map never holds stale tokens long-term
-setInterval(() => {
+// Lazy eviction: clean up on every set instead of a periodic timer.
+// This avoids the overhead of setInterval and is more predictable.
+function evictExpired() {
   const now = Date.now();
   for (const [key, entry] of tokenCache) {
     if (now > entry.expiresAt) tokenCache.delete(key);
   }
-}, CACHE_TTL_MS);
+}
 
 function withTimeout(promise, timeoutMs) {
   return Promise.race([
@@ -33,9 +35,15 @@ function getCached(token) {
 }
 
 function setCached(token, user) {
+  // Evict expired entries before adding new ones
+  if (tokenCache.size > MAX_CACHE_SIZE * 0.8) {
+    evictExpired();
+  }
+
   tokenCache.set(token, { user, expiresAt: Date.now() + CACHE_TTL_MS });
-  // Prevent unbounded growth: evict oldest if over 500 entries
-  if (tokenCache.size > 500) {
+
+  // If still over limit after eviction, remove oldest
+  if (tokenCache.size > MAX_CACHE_SIZE) {
     const firstKey = tokenCache.keys().next().value;
     tokenCache.delete(firstKey);
   }

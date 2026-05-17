@@ -37,24 +37,31 @@ async function predict(req, res, next) {
       return res.status(400).json({ success: false, error: "Validation failed", details: messages });
     }
 
-    const { 
+    const {
       age, bmi, bloodPressure, cholesterol, smoking, activityLevel,
       diabetes, hypertension, heartDisease, kidneyDisease, location,
-      dietType, waterIntake, sleepDuration, alcoholConsumption, workType 
+      dietType, waterIntake, sleepDuration, alcoholConsumption, workType
     } = parseResult.data;
-    
-    const healthData = { 
+
+    const healthData = {
       age, bmi, bloodPressure, cholesterol, smoking, activityLevel,
       diabetes, hypertension, heartDisease, kidneyDisease, location,
-      dietType, waterIntake, sleepDuration, alcoholConsumption, workType 
+      dietType, waterIntake, sleepDuration, alcoholConsumption, workType
     };
 
+    // Risk calculation is synchronous and fast; LLM is the slow part.
     const riskResult = calculateRiskScore(healthData);
 
-    const llmResult = await generateHealthAdvice(healthData, riskResult);
-
-    // Store in Supabase using authenticated client so RLS allows the insert
+    // Start LLM call and DB client creation in parallel.
+    // The LLM call doesn't depend on the DB, and we need the auth client
+    // for the insert that follows the LLM response.
     const supabase = createAuthClient(req.token);
+    const llmPromise = generateHealthAdvice(healthData, riskResult);
+
+    const llmResult = await llmPromise;
+
+    // Store in Supabase — this must complete before responding so the
+    // client gets a valid report ID.
     const { data: report, error: dbError } = await supabase
       .from("health_reports")
       .insert({

@@ -1,7 +1,7 @@
 import { useMemo, memo } from "react";
 import DOMPurify from "dompurify";
 
-const SANITIZE_OPTIONS = { ALLOWED_TAGS: ["strong", "em", "b", "i"] };
+const SANITIZE_OPTIONS = { ALLOWED_TAGS: ["strong", "em", "b", "i"], ALLOWED_ATTR: [] };
 
 function getRiskColor(level) {
   switch (level) {

@@ -37,7 +37,7 @@ async function getReports(req, res, next) {
     const supabase = createAuthClient(req.token);
     const { data, error, count } = await supabase
       .from("health_reports")
-      .select(LIST_COLUMNS, { count: "exact" })
+      .select(LIST_COLUMNS, { count: "estimated" })
       .eq("user_id", req.user.id)
       .order("created_at", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);

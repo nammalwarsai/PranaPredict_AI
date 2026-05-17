@@ -471,7 +471,7 @@ function HealthTips() {
 
             <ul className="ht-tips-list">
               {data.categories[activeCategory].tips.map((tip, i) => (
-                <li key={i} className="ht-tip-item">
+                <li key={`${activeCategory}-${i}`} className="ht-tip-item">
                   <span
                     className="ht-tip-num"
                     style={{ backgroundColor: data.color }}

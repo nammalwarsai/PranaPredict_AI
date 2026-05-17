@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,16 +13,22 @@ import {
 import { Line, Doughnut } from "react-chartjs-2";
 import { useTheme } from "../context/ThemeContext";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement,
-  Tooltip,
-  Legend,
-  Filler
-);
+let _registered = false;
+function registerOnce() {
+  if (_registered) return;
+  _registered = true;
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    ArcElement,
+    Tooltip,
+    Legend,
+    Filler
+  );
+}
+registerOnce();
 
 function TrendCharts({ reports }) {
   const { theme } = useTheme();
@@ -209,4 +215,4 @@ function TrendCharts({ reports }) {
   );
 }
 
-export default TrendCharts;
+export default memo(TrendCharts);

@@ -1,26 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { Link } from "react-router-dom";
 import { getReports } from "../api/api";
 import TrendCharts from "../components/TrendCharts";
 import { generateHealthReportPdf } from "../utils/pdfReportGenerator";
 
-function getRiskTone(level) {
-  switch (level) {
-    case "Low": return "low";
-    case "Moderate": return "moderate";
-    case "High": return "high";
-    default: return "unknown";
-  }
-}
+const RISK_TONE_MAP = { Low: "low", Moderate: "moderate", High: "high" };
+function getRiskTone(level) { return RISK_TONE_MAP[level] || "unknown"; }
 
+const DATE_OPTS = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
 function formatReportDate(value) {
-  return new Date(value).toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return new Date(value).toLocaleDateString("en-IN", DATE_OPTS);
 }
 
 function History() {
@@ -42,11 +31,13 @@ function History() {
         const response = await getReports(page);
         if (!active) return;
         clearTimeout(safetyTimer);
+        safetyTimer = null;
         setReports(response.data.data || []);
         setPagination(response.data.pagination || null);
       } catch (err) {
         if (!active) return;
         clearTimeout(safetyTimer);
+        safetyTimer = null;
         if (err.code === "ECONNABORTED") {
           setError("Loading reports timed out. Please try again.");
         } else {
@@ -67,13 +58,12 @@ function History() {
 
     return () => {
       active = false;
-      clearTimeout(safetyTimer);
+      if (safetyTimer) clearTimeout(safetyTimer);
     };
   }, [page]);
 
   const handleDownload = useCallback((report) => {
     setDownloadingId(report.id);
-
     try {
       generateHealthReportPdf(report);
     } catch (downloadError) {
@@ -83,6 +73,14 @@ function History() {
       setDownloadingId(null);
     }
   }, []);
+
+  const totalPages = pagination?.totalPages ?? 1;
+  const averageScore = useMemo(() =>
+    reports.length
+      ? Math.round(reports.reduce((sum, r) => sum + Number(r.risk_score || 0), 0) / reports.length)
+      : 0,
+    [reports]
+  );
 
   const pageHeader = (
     <div className="page-head history-page-head">
@@ -106,11 +104,6 @@ function History() {
       </div>
     );
   }
-
-  const totalPages = pagination?.totalPages ?? 1;
-  const averageScore = reports.length
-    ? Math.round(reports.reduce((sum, report) => sum + Number(report.risk_score || 0), 0) / reports.length)
-    : 0;
 
   return (
     <div className="history-page history-page-modern">
@@ -199,7 +192,7 @@ function History() {
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
             >
-              ← Previous
+              Previous
             </button>
             <span className="pagination-info">Page {page} of {totalPages}</span>
             <button
@@ -207,7 +200,7 @@ function History() {
               disabled={page >= totalPages}
               onClick={() => setPage((p) => p + 1)}
             >
-              Next →
+              Next
             </button>
           </div>
         )}
@@ -217,4 +210,4 @@ function History() {
   );
 }
 
-export default History;
+export default memo(History);

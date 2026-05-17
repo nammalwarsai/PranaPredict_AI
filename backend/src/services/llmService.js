@@ -155,11 +155,11 @@ function getFallbackAdvice(healthData, riskResult) {
   if (bmi > 30) tips.push("Consider a balanced diet with portion control to manage your BMI.");
   else if (bmi > 25) tips.push("Your BMI is slightly elevated. Light dietary adjustments can help.");
 
-  if (bloodPressure) {
-    const parts = bloodPressure.split("/").map(Number);
+  if (bloodPressure && typeof bloodPressure === "string") {
+    const parts = bloodPressure.split("/").map((v) => parseInt(v, 10));
     const sys = parts[0];
     const dia = parts[1];
-    if (!isNaN(sys) && !isNaN(dia)) {
+    if (Number.isFinite(sys) && Number.isFinite(dia) && sys > 0 && dia > 0) {
       if (sys > 140 || dia > 90) tips.push("Your blood pressure is high. Reduce sodium intake and manage stress.");
       else if (sys > 120 || dia > 80) tips.push("Monitor your blood pressure regularly and stay hydrated.");
     }

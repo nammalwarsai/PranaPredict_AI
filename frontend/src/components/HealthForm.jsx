@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback, memo } from "react";
 import { calculateBMI, getBMICategory } from "../utils/bmiCalculator";
 import "./HealthForm.css";
 
@@ -11,6 +11,27 @@ const CONDITION_FIELDS = [
   { key: "kidneyDisease", label: "Kidney Disease" },
 ];
 
+const INITIAL_FORM_DATA = {
+  age: 30,
+  weight: 70,
+  height: 170,
+  systolic: 120,
+  diastolic: 80,
+  cholesterol: "normal",
+  diabetes: false,
+  hypertension: false,
+  heartDisease: false,
+  kidneyDisease: false,
+  location: "urban",
+  dietType: "vegetarian",
+  waterIntake: 2,
+  sleepDuration: 7,
+  alcoholConsumption: "none",
+  workType: "active",
+  activityLevel: "moderate",
+  smoking: false,
+};
+
 function toLabel(value) {
   return String(value).replace(/-/g, " ");
 }
@@ -19,29 +40,7 @@ function HealthForm({ onSubmit, loading }) {
   const [step, setStep] = useState(1);
   const [finalConfirmed, setFinalConfirmed] = useState(false);
 
-  const [formData, setFormData] = useState({
-    // Step 1: Basic Info
-    age: 30,
-    weight: 70,
-    height: 170,
-    // Step 2: Vitals & Medical History
-    systolic: 120,
-    diastolic: 80,
-    cholesterol: "normal",
-    diabetes: false,
-    hypertension: false,
-    heartDisease: false,
-    kidneyDisease: false,
-    // Step 3: Lifestyle & Environment
-    location: "urban",
-    dietType: "vegetarian",
-    waterIntake: 2,
-    sleepDuration: 7,
-    alcoholConsumption: "none",
-    workType: "active",
-    activityLevel: "moderate",
-    smoking: false,
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
   const bmiValue = useMemo(
     () => calculateBMI(Number(formData.weight), Number(formData.height)),
@@ -58,7 +57,7 @@ function HealthForm({ onSubmit, loading }) {
     [formData]
   );
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
     const nextValue =
       type === "checkbox" ? checked : type === "range" || type === "number" ? Number(value) : value;
@@ -67,12 +66,11 @@ function HealthForm({ onSubmit, loading }) {
       ...prev,
       [name]: nextValue,
     }));
-  };
+  }, []);
 
-  const setToggleValue = (name, value) => {
-    const newData = { ...formData, [name]: value };
-    setFormData(newData);
-  };
+  const setToggleValue = useCallback((name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
   const handleNext = () => {
     setStep((s) => {
@@ -404,4 +402,4 @@ function HealthForm({ onSubmit, loading }) {
   );
 }
 
-export default HealthForm;
+export default memo(HealthForm);

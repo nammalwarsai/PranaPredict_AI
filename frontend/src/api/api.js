@@ -61,10 +61,14 @@ export const submitPrediction = (healthData) => {
     _predictionController = null;
   }
   _predictionController = new AbortController();
+  const controller = _predictionController;
   return API.post("/api/predict", healthData, {
-    signal: _predictionController.signal,
-    // LLM calls can be slow; give this endpoint its own generous timeout
+    signal: controller.signal,
     timeout: 30000,
+  }).finally(() => {
+    if (_predictionController === controller) {
+      _predictionController = null;
+    }
   });
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,7 +13,11 @@ import { Line, Bar } from "react-chartjs-2";
 import { getAllReports } from "../api/api";
 import { useTheme } from "../context/ThemeContext";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend);
+let _registered = false;
+if (!_registered) {
+  _registered = true;
+  ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend);
+}
 
 const ANALYTICS_FIELDS = [
   { key: "risk_score", label: "Risk Score", unit: "", type: "number" },
@@ -105,70 +109,63 @@ function Analytics() {
       .filter((p) => p.value !== null);
   }, [reports, selectedField]);
 
-  const average = useMemo(() => {
-    if (!points.length) return "—";
-    const sum = points.reduce((acc, p) => acc + p.value, 0);
-    return (sum / points.length).toFixed(1);
+  const stats = useMemo(() => {
+    if (!points.length) return { latest: "\u2014", average: "\u2014", min: "\u2014", max: "\u2014" };
+    const vals = points.map((p) => p.value);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    return {
+      latest: vals[vals.length - 1],
+      average: (sum / vals.length).toFixed(1),
+      min: Math.min(...vals),
+      max: Math.max(...vals),
+    };
   }, [points]);
 
-  const latest = points.length ? points[points.length - 1].value : "—";
-  const min = points.length ? Math.min(...points.map((p) => p.value)) : "—";
-  const max = points.length ? Math.max(...points.map((p) => p.value)) : "—";
+  const labels = useMemo(() => points.map((p) => p.label), [points]);
+  const values = useMemo(() => points.map((p) => p.value), [points]);
 
-  const labels = points.map((p) => p.label);
-  const values = points.map((p) => p.value);
-  const axisText = isDark ? "#94a3b8" : "#64748b";
-  const gridColor = isDark ? "#334155" : "#e2e8f0";
-  const lineColor = "#2563eb";
-
-  const lineData = {
+  const lineData = useMemo(() => ({
     labels,
-    datasets: [
-      {
-        label: selectedField.label,
-        data: values,
-        borderColor: lineColor,
-        backgroundColor: isDark ? "rgba(37, 99, 235, 0.2)" : "rgba(37, 99, 235, 0.1)",
-        pointBackgroundColor: "#1d4ed8",
-        pointRadius: 4,
-        borderWidth: 2.5,
-        tension: 0.3,
-        fill: true,
-      },
-    ],
-  };
+    datasets: [{
+      label: selectedField.label,
+      data: values,
+      borderColor: "#2563eb",
+      backgroundColor: isDark ? "rgba(37, 99, 235, 0.2)" : "rgba(37, 99, 235, 0.1)",
+      pointBackgroundColor: "#1d4ed8",
+      pointRadius: 4,
+      borderWidth: 2.5,
+      tension: 0.3,
+      fill: true,
+    }],
+  }), [labels, values, selectedField.label, isDark]);
 
-  const barData = {
+  const barData = useMemo(() => ({
     labels,
-    datasets: [
-      {
-        label: selectedField.label,
-        data: values,
-        backgroundColor: "rgba(14, 165, 233, 0.75)",
-        borderRadius: 8,
-        maxBarThickness: 32,
-      },
-    ],
-  };
+    datasets: [{
+      label: selectedField.label,
+      data: values,
+      backgroundColor: "rgba(14, 165, 233, 0.75)",
+      borderRadius: 8,
+      maxBarThickness: 32,
+    }],
+  }), [labels, values, selectedField.label]);
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { backgroundColor: isDark ? "#334155" : "#1e293b" },
-    },
-    scales: {
-      y: {
-        ticks: { color: axisText },
-        grid: { color: gridColor },
+  const chartOptions = useMemo(() => {
+    const axisText = isDark ? "#94a3b8" : "#64748b";
+    const gridColor = isDark ? "#334155" : "#e2e8f0";
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: isDark ? "#334155" : "#1e293b" },
       },
-      x: {
-        ticks: { color: axisText },
-        grid: { display: false },
+      scales: {
+        y: { ticks: { color: axisText }, grid: { color: gridColor } },
+        x: { ticks: { color: axisText }, grid: { display: false } },
       },
-    },
-  };
+    };
+  }, [isDark]);
 
   return (
     <div className="analytics-page">
@@ -211,15 +208,15 @@ function Analytics() {
           <div className="analytics-stats">
             <div className="analytics-stat-card">
               <span className="analytics-stat-label">Latest</span>
-              <strong>{latest}{selectedField.unit ? ` ${selectedField.unit}` : ""}</strong>
+              <strong>{stats.latest}{selectedField.unit ? ` ${selectedField.unit}` : ""}</strong>
             </div>
             <div className="analytics-stat-card">
               <span className="analytics-stat-label">Average</span>
-              <strong>{average}{selectedField.unit ? ` ${selectedField.unit}` : ""}</strong>
+              <strong>{stats.average}{selectedField.unit ? ` ${selectedField.unit}` : ""}</strong>
             </div>
             <div className="analytics-stat-card">
               <span className="analytics-stat-label">Range</span>
-              <strong>{min} - {max}</strong>
+              <strong>{stats.min} - {stats.max}</strong>
             </div>
           </div>
 
@@ -243,4 +240,4 @@ function Analytics() {
   );
 }
 
-export default Analytics;
+export default memo(Analytics);

@@ -20,7 +20,14 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
  */
 const _authClientCache = new Map();
 const AUTH_CLIENT_MAX = 200;
-const AUTH_CLIENT_TTL_MS = 5 * 60 * 1000; // 5 minutes — aligns with typical JWT expiry window
+const AUTH_CLIENT_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+function evictExpiredClients() {
+  const now = Date.now();
+  for (const [key, entry] of _authClientCache) {
+    if (now > entry.expiresAt) _authClientCache.delete(key);
+  }
+}
 
 function createAuthClient(accessToken) {
   const now = Date.now();
@@ -39,9 +46,14 @@ function createAuthClient(accessToken) {
     }
   );
 
+  // Lazy eviction: clean expired entries when cache is getting large
+  if (_authClientCache.size > AUTH_CLIENT_MAX * 0.8) {
+    evictExpiredClients();
+  }
+
   _authClientCache.set(accessToken, { client, expiresAt: now + AUTH_CLIENT_TTL_MS });
 
-  // Prevent unbounded growth: evict oldest entry when over the limit
+  // If still over limit after eviction, remove oldest
   if (_authClientCache.size > AUTH_CLIENT_MAX) {
     const firstKey = _authClientCache.keys().next().value;
     _authClientCache.delete(firstKey);
