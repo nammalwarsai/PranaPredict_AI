@@ -1,4 +1,5 @@
 const supabase = require("../config/supabaseClient");
+const { createAuthClient } = supabase;
 
 // In-memory token cache: token -> { user, expiresAt }
 const tokenCache = new Map();
@@ -74,6 +75,22 @@ async function authMiddleware(req, res, next) {
 
     if (error || !user) {
       return res.status(401).json({ success: false, error: "Invalid or expired token" });
+    }
+
+    // Verify account is not suspended in profiles
+    const authClient = createAuthClient(token);
+    const { data: profile, error: profileErr } = await authClient
+      .from("profiles")
+      .select("is_suspended")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileErr) {
+      console.error("[Auth] Profile suspension check error:", profileErr.message);
+    }
+
+    if (profile && profile.is_suspended) {
+      return res.status(403).json({ success: false, error: "Your account has been suspended by an administrator." });
     }
 
     setCached(token, user);

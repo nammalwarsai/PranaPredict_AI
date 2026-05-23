@@ -41,7 +41,7 @@ const PUBLIC_LINKS = [
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, loading, signOut } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -66,7 +66,17 @@ function Navbar() {
     navigate("/login", { replace: true });
   };
 
-  const links = !loading ? (user ? AUTH_LINKS : PUBLIC_LINKS) : [];
+  let links = [];
+  if (!loading) {
+    if (user) {
+      links = [...AUTH_LINKS];
+      if (profile?.is_admin) {
+        links.push({ to: "/admin/dashboard", label: "Admin Portal", isAdminLink: true });
+      }
+    } else {
+      links = PUBLIC_LINKS;
+    }
+  }
 
   const themeButton = (
     <button
@@ -108,17 +118,19 @@ function Navbar() {
         role="navigation"
         aria-label="Primary"
       >
-        {links.map(({ to, label }) => (
+        {links.map(({ to, label, isAdminLink }) => (
           <Link
             key={to}
             to={to}
-            className={isActive(to) ? "active" : ""}
+            className={`${isActive(to) ? "active" : ""} ${isAdminLink ? "nav-admin-link" : ""}`}
+            style={isAdminLink ? { color: "#10b981", fontWeight: "600" } : undefined}
             aria-current={isActive(to) ? "page" : undefined}
             onClick={closeMenu}
           >
             {label}
           </Link>
         ))}
+
 
         {!loading && (
           <>

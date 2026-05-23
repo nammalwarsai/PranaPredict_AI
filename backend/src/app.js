@@ -7,6 +7,7 @@ const authMiddleware = require("./middlewares/authMiddleware");
 const predictionRoutes = require("./routes/predictionRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const emailRoutes = require("./routes/emailRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
@@ -61,6 +62,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/predict", authMiddleware, predictionRoutes);
 app.use("/api/reports", authMiddleware, reportRoutes);
 app.use("/api/email", authMiddleware, emailRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

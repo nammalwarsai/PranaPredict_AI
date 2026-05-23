@@ -96,4 +96,13 @@ export const getAllReports = async () => {
 export const sendLoginNotification = () => API.post("/api/email/login");
 export const sendLogoutNotification = () => API.post("/api/email/logout");
 
+// ── Admin Panel APIs ───────────────────────────────────────────────
+export const adminLogin = (email, password) => API.post("/api/admin/auth/login", { email, password });
+export const getAdminStats = () => API.get("/api/admin/stats");
+export const getAdminUsers = (params) => API.get("/api/admin/users", { params });
+export const getAdminUserById = (id) => API.get(`/api/admin/users/${id}`);
+export const toggleUserSuspended = (id, isSuspended) => API.put(`/api/admin/users/${id}/suspend`, { isSuspended });
+export const deleteUserAdmin = (id) => API.delete(`/api/admin/users/${id}`);
+export const getAdminReports = (params) => API.get("/api/admin/reports", { params });
+
 export default API;
