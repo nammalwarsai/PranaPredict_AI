@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getAdminStats } from "../api/api";
 import AdminSidebar from "../components/AdminSidebar";
+import { useTheme } from "../context/ThemeContext";
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -20,6 +21,8 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Le
  * Premium dashboard cockpit presenting aggregated KPIs, trend metrics, and distributions.
  */
 function AdminDashboard() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,11 +50,11 @@ function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="admin-layout" style={adminLayoutStyle}>
+      <div className="admin-layout" style={adminLayoutStyle(isDark)}>
         <AdminSidebar />
         <div style={adminContentLoadingStyle}>
           <div className="spinner" style={spinnerStyle}></div>
-          <p style={{ color: "#9ca3af", fontFamily: "'Outfit', sans-serif" }}>Compiling health statistics...</p>
+          <p style={{ color: isDark ? "#9ca3af" : "#475569", fontFamily: "'Outfit', sans-serif" }}>Compiling health statistics...</p>
         </div>
       </div>
     );
@@ -59,10 +62,10 @@ function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="admin-layout" style={adminLayoutStyle}>
+      <div className="admin-layout" style={adminLayoutStyle(isDark)}>
         <AdminSidebar />
         <div style={adminContentErrorStyle}>
-          <div style={errorBoxStyle}>
+          <div style={errorBoxStyle(isDark)}>
             <h3>⚠️ Administration Error</h3>
             <p>{error}</p>
             <button onClick={() => window.location.reload()} style={retryButtonStyle}>Retry Fetch</button>
@@ -99,7 +102,7 @@ function AdminDashboard() {
     plugins: {
       legend: {
         position: "right",
-        labels: { color: "#e2e8f0", font: { family: "Inter", size: 12 }, padding: 12, usePointStyle: true },
+        labels: { color: isDark ? "#e2e8f0" : "#1f2937", font: { family: "Inter", size: 12 }, padding: 12, usePointStyle: true },
       },
     },
   };
@@ -128,20 +131,20 @@ function AdminDashboard() {
     },
     scales: {
       y: {
-        grid: { color: "rgba(255,255,255,0.06)" },
-        ticks: { color: "#94a3b8", font: { size: 10 } },
+        grid: { color: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" },
+        ticks: { color: isDark ? "#94a3b8" : "#475569", font: { size: 10 } },
       },
       x: {
         grid: { display: false },
-        ticks: { color: "#94a3b8", font: { size: 10 } },
+        ticks: { color: isDark ? "#94a3b8" : "#475569", font: { size: 10 } },
       },
     },
   };
 
   return (
-    <div className="admin-layout" style={adminLayoutStyle}>
+    <div className="admin-layout" style={adminLayoutStyle(isDark)}>
       <AdminSidebar />
-      <main className="admin-main-content" style={adminMainContentStyle}>
+      <main className="admin-main-content" style={adminMainContentStyle(isDark)}>
         
         {/* Header Block */}
         <header style={dashboardHeaderStyle}>
@@ -149,11 +152,11 @@ function AdminDashboard() {
             <span style={{ fontSize: "12px", color: "#10b981", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase" }}>
               Ayurvedic AI Core Dashboard
             </span>
-            <h1 style={{ margin: "4px 0 0 0", fontSize: "28px", color: "#fff", fontWeight: "700", fontFamily: "'Outfit', sans-serif" }}>
+            <h1 style={{ margin: "4px 0 0 0", fontSize: "28px", color: isDark ? "#fff" : "#0f172a", fontWeight: "700", fontFamily: "'Outfit', sans-serif", transition: "color 0.3s ease" }}>
               Platform Overview
             </h1>
           </div>
-          <div style={timebadgeStyle}>
+          <div style={timebadgeStyle(isDark)}>
             <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10b981", display: "inline-block" }}></span>
             SECURE LIVE STREAM
           </div>
@@ -163,18 +166,18 @@ function AdminDashboard() {
         <section style={kpisGridStyle}>
           
           {/* KPI Card 1: Total Users */}
-          <div className="kpi-card" style={kpiCardStyle}>
+          <div className="kpi-card" style={kpiCardStyle(isDark)}>
             <div style={kpiHeaderStyle}>
-              <span style={kpiLabelStyle}>Total Patients</span>
+              <span style={kpiLabelStyle(isDark)}>Total Patients</span>
               <span style={{ ...kpiIconStyle, background: "rgba(16, 185, 129, 0.1)", color: "#10b981" }}>👥</span>
             </div>
             <div style={kpiValueWrapStyle}>
-              <span style={kpiValueStyle}>{kpis?.totalUsers || 0}</span>
+              <span style={kpiValueStyle(isDark)}>{kpis?.totalUsers || 0}</span>
               <span style={{ ...kpiTrendStyle, color: kpis?.monthlyGrowth >= 0 ? "#10b981" : "#ef4444" }}>
                 {kpis?.monthlyGrowth >= 0 ? "↑" : "↓"} {Math.abs(kpis?.monthlyGrowth || 0)}%
               </span>
             </div>
-            <span style={kpiSubtextStyle}>monthly growth rate</span>
+            <span style={kpiSubtextStyle(isDark)}>monthly growth rate</span>
             {/* Sparkline Visual (CSS-only futuristic line) */}
             <div style={sparklineStyle}>
               <div style={{ ...sparklineBarStyle, height: "45%", background: "rgba(16, 185, 129, 0.3)" }}></div>
@@ -186,16 +189,16 @@ function AdminDashboard() {
           </div>
 
           {/* KPI Card 2: Active Users */}
-          <div className="kpi-card" style={kpiCardStyle}>
+          <div className="kpi-card" style={kpiCardStyle(isDark)}>
             <div style={kpiHeaderStyle}>
-              <span style={kpiLabelStyle}>Active Users (30d)</span>
+              <span style={kpiLabelStyle(isDark)}>Active Users (30d)</span>
               <span style={{ ...kpiIconStyle, background: "rgba(6, 182, 212, 0.1)", color: "#06b6d4" }}>⚡</span>
             </div>
             <div style={kpiValueWrapStyle}>
-              <span style={kpiValueStyle}>{kpis?.activeUsers || 0}</span>
+              <span style={kpiValueStyle(isDark)}>{kpis?.activeUsers || 0}</span>
               <span style={{ color: "#06b6d4", fontSize: "13px", fontWeight: "600" }}>Live</span>
             </div>
-            <span style={kpiSubtextStyle}>assessed in past 30 days</span>
+            <span style={kpiSubtextStyle(isDark)}>assessed in past 30 days</span>
             <div style={sparklineStyle}>
               <div style={{ ...sparklineBarStyle, height: "30%", background: "rgba(6, 182, 212, 0.3)" }}></div>
               <div style={{ ...sparklineBarStyle, height: "40%", background: "rgba(6, 182, 212, 0.3)" }}></div>
@@ -206,16 +209,16 @@ function AdminDashboard() {
           </div>
 
           {/* KPI Card 3: Daily Assessments */}
-          <div className="kpi-card" style={kpiCardStyle}>
+          <div className="kpi-card" style={kpiCardStyle(isDark)}>
             <div style={kpiHeaderStyle}>
-              <span style={kpiLabelStyle}>Daily Assessments</span>
+              <span style={kpiLabelStyle(isDark)}>Daily Assessments</span>
               <span style={{ ...kpiIconStyle, background: "rgba(245, 158, 11, 0.1)", color: "#f59e0b" }}>📋</span>
             </div>
             <div style={kpiValueWrapStyle}>
-              <span style={kpiValueStyle}>{kpis?.dailyAssessments || 0}</span>
+              <span style={kpiValueStyle(isDark)}>{kpis?.dailyAssessments || 0}</span>
               <span style={{ color: "#f59e0b", fontSize: "13px", fontWeight: "600" }}>+Today</span>
             </div>
-            <span style={kpiSubtextStyle}>completed assessments today</span>
+            <span style={kpiSubtextStyle(isDark)}>completed assessments today</span>
             <div style={sparklineStyle}>
               <div style={{ ...sparklineBarStyle, height: "20%", background: "rgba(245, 158, 11, 0.3)" }}></div>
               <div style={{ ...sparklineBarStyle, height: "35%", background: "rgba(245, 158, 11, 0.3)" }}></div>
@@ -226,16 +229,16 @@ function AdminDashboard() {
           </div>
 
           {/* KPI Card 4: Average Risk Score */}
-          <div className="kpi-card" style={kpiCardStyle}>
+          <div className="kpi-card" style={kpiCardStyle(isDark)}>
             <div style={kpiHeaderStyle}>
-              <span style={kpiLabelStyle}>Avg Risk Score</span>
+              <span style={kpiLabelStyle(isDark)}>Avg Risk Score</span>
               <span style={{ ...kpiIconStyle, background: "rgba(139, 92, 246, 0.1)", color: "#8b5cf6" }}>📊</span>
             </div>
             <div style={kpiValueWrapStyle}>
-              <span style={kpiValueStyle}>{kpis?.avgRiskScore || 0}%</span>
+              <span style={kpiValueStyle(isDark)}>{kpis?.avgRiskScore || 0}%</span>
               <span style={{ color: "#8b5cf6", fontSize: "13px", fontWeight: "600" }}>Index</span>
             </div>
-            <span style={kpiSubtextStyle}>mean assessment risk score</span>
+            <span style={kpiSubtextStyle(isDark)}>mean assessment risk score</span>
             <div style={sparklineStyle}>
               <div style={{ ...sparklineBarStyle, height: "80%", background: "rgba(139, 92, 246, 0.3)" }}></div>
               <div style={{ ...sparklineBarStyle, height: "75%", background: "rgba(139, 92, 246, 0.3)" }}></div>
@@ -246,16 +249,16 @@ function AdminDashboard() {
           </div>
 
           {/* KPI Card 5: High-Risk Users */}
-          <div className="kpi-card" style={kpiCardStyle}>
+          <div className="kpi-card" style={kpiCardStyle(isDark)}>
             <div style={kpiHeaderStyle}>
-              <span style={kpiLabelStyle}>High-Risk Patients</span>
+              <span style={kpiLabelStyle(isDark)}>High-Risk Patients</span>
               <span style={{ ...kpiIconStyle, background: "rgba(239, 68, 68, 0.1)", color: "#ef4444" }}>⚠️</span>
             </div>
             <div style={kpiValueWrapStyle}>
-              <span style={kpiValueStyle}>{kpis?.highRiskUsers || 0}</span>
+              <span style={kpiValueStyle(isDark)}>{kpis?.highRiskUsers || 0}</span>
               <span style={{ color: "#ef4444", fontSize: "13px", fontWeight: "600" }}>Critical</span>
             </div>
-            <span style={kpiSubtextStyle}>active users scoring &gt; 70%</span>
+            <span style={kpiSubtextStyle(isDark)}>active users scoring &gt; 70%</span>
             <div style={sparklineStyle}>
               <div style={{ ...sparklineBarStyle, height: "15%", background: "rgba(239, 68, 68, 0.3)" }}></div>
               <div style={{ ...sparklineBarStyle, height: "25%", background: "rgba(239, 68, 68, 0.3)" }}></div>
@@ -266,16 +269,16 @@ function AdminDashboard() {
           </div>
 
           {/* KPI Card 6: AI Accuracy */}
-          <div className="kpi-card" style={kpiCardStyle}>
+          <div className="kpi-card" style={kpiCardStyle(isDark)}>
             <div style={kpiHeaderStyle}>
-              <span style={kpiLabelStyle}>AI Model Accuracy</span>
+              <span style={kpiLabelStyle(isDark)}>AI Model Accuracy</span>
               <span style={{ ...kpiIconStyle, background: "rgba(16, 185, 129, 0.1)", color: "#10b981" }}>🤖</span>
             </div>
             <div style={kpiValueWrapStyle}>
-              <span style={kpiValueStyle}>{kpis?.aiPredictionAccuracy || 98.4}%</span>
+              <span style={kpiValueStyle(isDark)}>{kpis?.aiPredictionAccuracy || 98.4}%</span>
               <span style={{ color: "#10b981", fontSize: "13px", fontWeight: "600" }}>Stable</span>
             </div>
-            <span style={kpiSubtextStyle}>Qwen-2.5 validation index</span>
+            <span style={kpiSubtextStyle(isDark)}>Qwen-2.5 validation index</span>
             <div style={sparklineStyle}>
               <div style={{ ...sparklineBarStyle, height: "95%", background: "rgba(16, 185, 129, 0.3)" }}></div>
               <div style={{ ...sparklineBarStyle, height: "96%", background: "rgba(16, 185, 129, 0.3)" }}></div>
@@ -290,16 +293,16 @@ function AdminDashboard() {
         {/* Dynamic visual charts layout */}
         <section style={chartsRowStyle}>
           {/* Chart 1: Risk score distribution */}
-          <div className="dashboard-chart-card" style={chartCardStyle}>
-            <h3 style={chartTitleStyle}>Risk Score Group Distribution</h3>
+          <div className="dashboard-chart-card" style={chartCardStyle(isDark)}>
+            <h3 style={chartTitleStyle(isDark)}>Risk Score Group Distribution</h3>
             <div style={chartWrapStyle}>
               <Bar data={riskData} options={riskOptions} />
             </div>
           </div>
 
           {/* Chart 2: BMI category ratio */}
-          <div className="dashboard-chart-card" style={chartCardStyle}>
-            <h3 style={chartTitleStyle}>BMI Categories Ratio</h3>
+          <div className="dashboard-chart-card" style={chartCardStyle(isDark)}>
+            <h3 style={chartTitleStyle(isDark)}>BMI Categories Ratio</h3>
             <div style={{ ...chartWrapStyle, height: "200px" }}>
               <Doughnut data={bmiData} options={bmiOptions} />
             </div>
@@ -307,46 +310,56 @@ function AdminDashboard() {
         </section>
 
         {/* Quick Operations panel */}
-        <section style={quickOpsStyle}>
-          <h3 style={{ fontSize: "16px", color: "#fff", margin: "0 0 16px 0", fontWeight: "600" }}>System Portals</h3>
+        <section style={quickOpsStyle(isDark)}>
+          <h3 style={{ fontSize: "16px", color: isDark ? "#fff" : "#0f172a", margin: "0 0 16px 0", fontWeight: "600", transition: "color 0.3s ease" }}>System Portals</h3>
           <div style={quickOpsGridStyle}>
-            <Link to="/admin/users" style={opCardStyle}>
-              <div style={opIconStyle}>👥</div>
+            <Link to="/admin/users" style={opCardStyle(isDark)}>
+              <div style={opIconStyle(isDark)}>👥</div>
               <div>
-                <h4 style={opTitleStyle}>User Directory</h4>
-                <p style={opDescStyle}>Search user records, inspect history timelines, suspend accounts.</p>
+                <h4 style={opTitleStyle(isDark)}>User Directory</h4>
+                <p style={opDescStyle(isDark)}>Search user records, inspect history timelines, suspend accounts.</p>
               </div>
             </Link>
 
-            <Link to="/admin/analytics" style={opCardStyle}>
-              <div style={opIconStyle}>📈</div>
+            <Link to="/admin/analytics" style={opCardStyle(isDark)}>
+              <div style={opIconStyle(isDark)}>📈</div>
               <div>
-                <h4 style={opTitleStyle}>Ayurvedic Analytics</h4>
-                <p style={opDescStyle}>Deep-dive disease frequency trends, lifestyle heatmaps, BMI insights.</p>
+                <h4 style={opTitleStyle(isDark)}>Ayurvedic Analytics</h4>
+                <p style={opDescStyle(isDark)}>Deep-dive disease frequency trends, lifestyle heatmaps, BMI insights.</p>
               </div>
             </Link>
 
-            <Link to="/admin/reports" style={opCardStyle}>
-              <div style={opIconStyle}>📄</div>
+            <Link to="/admin/reports" style={opCardStyle(isDark)}>
+              <div style={opIconStyle(isDark)}>📄</div>
               <div>
-                <h4 style={opTitleStyle}>Assessment logs</h4>
-                <p style={opDescStyle}>Batch paginated logs list, download CSV data, view report details.</p>
+                <h4 style={opTitleStyle(isDark)}>Assessment logs</h4>
+                <p style={opDescStyle(isDark)}>Batch paginated logs list, download CSV data, view report details.</p>
               </div>
             </Link>
           </div>
         </section>
 
       </main>
+      <style>{`
+        .kpi-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+        .dashboard-chart-card:hover {
+          border-color: rgba(16, 185, 129, 0.2) !important;
+        }
+      `}</style>
     </div>
   );
 }
 
-// ── Shared Inline CSS tokens ──────────────────────────────────────────
-const adminLayoutStyle = {
+// ── Theme-aware dynamic style definitions ─────────────────────────────
+const adminLayoutStyle = (isDark) => ({
   display: "flex",
   minHeight: "100vh",
-  background: "var(--bg-dark, #0b0f19)",
-};
+  background: isDark ? "#0b0f19" : "#f1f5f9",
+  transition: "background 0.3s ease"
+});
 
 const adminContentLoadingStyle = {
   flex: 1,
@@ -365,17 +378,17 @@ const adminContentErrorStyle = {
   padding: "40px",
 };
 
-const errorBoxStyle = {
-  background: "rgba(239, 68, 68, 0.08)",
-  border: "1px solid rgba(239, 68, 68, 0.2)",
+const errorBoxStyle = (isDark) => ({
+  background: isDark ? "rgba(239, 68, 68, 0.08)" : "rgba(239, 68, 68, 0.05)",
+  border: isDark ? "1px solid rgba(239, 68, 68, 0.2)" : "1px solid rgba(239, 68, 68, 0.15)",
   padding: "32px",
   borderRadius: "16px",
   maxWidth: "500px",
   width: "100%",
   textAlign: "center",
   fontFamily: "Inter, sans-serif",
-  color: "#fff",
-};
+  color: isDark ? "#fff" : "#1f2937",
+});
 
 const retryButtonStyle = {
   marginTop: "16px",
@@ -398,13 +411,15 @@ const spinnerStyle = {
   marginBottom: "16px",
 };
 
-const adminMainContentStyle = {
+const adminMainContentStyle = (isDark) => ({
   flex: 1,
   padding: "36px",
   maxHeight: "calc(100vh - 64px)",
   overflowY: "auto",
   fontFamily: "Inter, sans-serif",
-};
+  color: isDark ? "#fff" : "#0f172a",
+  transition: "color 0.3s ease"
+});
 
 const dashboardHeaderStyle = {
   display: "flex",
@@ -413,10 +428,10 @@ const dashboardHeaderStyle = {
   marginBottom: "32px",
 };
 
-const timebadgeStyle = {
-  background: "rgba(16, 185, 129, 0.08)",
-  border: "1px solid rgba(16, 185, 129, 0.2)",
-  color: "#10b981",
+const timebadgeStyle = (isDark) => ({
+  background: isDark ? "rgba(16, 185, 129, 0.08)" : "rgba(16, 185, 129, 0.06)",
+  border: isDark ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(16, 185, 129, 0.15)",
+  color: isDark ? "#10b981" : "#059669",
   fontSize: "12px",
   fontWeight: "700",
   padding: "8px 16px",
@@ -425,7 +440,7 @@ const timebadgeStyle = {
   alignItems: "center",
   gap: "8px",
   letterSpacing: "0.5px",
-};
+});
 
 const kpisGridStyle = {
   display: "grid",
@@ -434,17 +449,18 @@ const kpisGridStyle = {
   marginBottom: "36px",
 };
 
-const kpiCardStyle = {
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
+const kpiCardStyle = (isDark) => ({
+  background: isDark ? "rgba(17, 24, 39, 0.65)" : "rgba(255, 255, 255, 0.9)",
+  border: isDark ? "1px solid rgba(255, 255, 255, 0.05)" : "1px solid rgba(0, 0, 0, 0.06)",
   borderRadius: "16px",
   padding: "24px",
   display: "flex",
   flexDirection: "column",
   position: "relative",
   overflow: "hidden",
-  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
-};
+  boxShadow: isDark ? "0 10px 30px rgba(0, 0, 0, 0.15)" : "0 10px 25px rgba(0, 0, 0, 0.04)",
+  transition: "all 0.3s ease",
+});
 
 const kpiHeaderStyle = {
   display: "flex",
@@ -453,11 +469,11 @@ const kpiHeaderStyle = {
   marginBottom: "12px",
 };
 
-const kpiLabelStyle = {
+const kpiLabelStyle = (isDark) => ({
   fontSize: "14px",
-  color: "#9ca3af",
+  color: isDark ? "#9ca3af" : "#475569",
   fontWeight: "500",
-};
+});
 
 const kpiIconStyle = {
   width: "32px",
@@ -476,22 +492,22 @@ const kpiValueWrapStyle = {
   marginBottom: "4px",
 };
 
-const kpiValueStyle = {
+const kpiValueStyle = (isDark) => ({
   fontSize: "28px",
   fontWeight: "700",
-  color: "#fff",
+  color: isDark ? "#fff" : "#0f172a",
   fontFamily: "'Outfit', sans-serif",
-};
+});
 
 const kpiTrendStyle = {
   fontSize: "13px",
   fontWeight: "600",
 };
 
-const kpiSubtextStyle = {
+const kpiSubtextStyle = (isDark) => ({
   fontSize: "12px",
-  color: "#6b7280",
-};
+  color: isDark ? "#6b7280" : "#64748b",
+});
 
 const sparklineStyle = {
   display: "flex",
@@ -514,33 +530,35 @@ const chartsRowStyle = {
   marginBottom: "36px",
 };
 
-const chartCardStyle = {
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
+const chartCardStyle = (isDark) => ({
+  background: isDark ? "rgba(17, 24, 39, 0.65)" : "rgba(255, 255, 255, 0.9)",
+  border: isDark ? "1px solid rgba(255, 255, 255, 0.05)" : "1px solid rgba(0, 0, 0, 0.06)",
   borderRadius: "16px",
   padding: "24px",
-  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
-};
+  boxShadow: isDark ? "0 10px 30px rgba(0, 0, 0, 0.15)" : "0 10px 25px rgba(0, 0, 0, 0.04)",
+  transition: "all 0.3s ease",
+});
 
-const chartTitleStyle = {
+const chartTitleStyle = (isDark) => ({
   fontSize: "15px",
-  color: "#fff",
+  color: isDark ? "#fff" : "#0f172a",
   margin: "0 0 20px 0",
   fontWeight: "600",
-};
+});
 
 const chartWrapStyle = {
   height: "220px",
   position: "relative",
 };
 
-const quickOpsStyle = {
-  background: "rgba(17, 24, 39, 0.4)",
-  border: "1px solid rgba(255, 255, 255, 0.03)",
+const quickOpsStyle = (isDark) => ({
+  background: isDark ? "rgba(17, 24, 39, 0.4)" : "rgba(255, 255, 255, 0.4)",
+  border: isDark ? "1px solid rgba(255, 255, 255, 0.03)" : "1px solid rgba(0, 0, 0, 0.03)",
   borderRadius: "16px",
   padding: "24px",
-  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-};
+  boxShadow: isDark ? "0 10px 30px rgba(0, 0, 0, 0.1)" : "0 10px 25px rgba(0,0,0,0.02)",
+  transition: "all 0.3s ease",
+});
 
 const quickOpsGridStyle = {
   display: "grid",
@@ -548,41 +566,42 @@ const quickOpsGridStyle = {
   gap: "20px",
 };
 
-const opCardStyle = {
+const opCardStyle = (isDark) => ({
   display: "flex",
   gap: "16px",
-  background: "rgba(17, 24, 39, 0.6)",
-  border: "1px solid rgba(255,255,255,0.05)",
+  background: isDark ? "rgba(17, 24, 39, 0.6)" : "rgba(255, 255, 255, 0.8)",
+  border: isDark ? "1px solid rgba(255, 255, 255, 0.05)" : "1px solid rgba(0, 0, 0, 0.06)",
   borderRadius: "12px",
   padding: "20px",
   textDecoration: "none",
   color: "inherit",
   transition: "all 0.2s ease",
-};
+});
 
-const opIconStyle = {
+const opIconStyle = (isDark) => ({
   fontSize: "24px",
   width: "48px",
   height: "48px",
   borderRadius: "10px",
-  background: "rgba(255,255,255,0.03)",
+  background: isDark ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.03)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-};
+});
 
-const opTitleStyle = {
+const opTitleStyle = (isDark) => ({
   fontSize: "15px",
   fontWeight: "600",
-  color: "#fff",
+  color: isDark ? "#fff" : "#0f172a",
   margin: "0 0 4px 0",
-};
+});
 
-const opDescStyle = {
+const opDescStyle = (isDark) => ({
   fontSize: "12px",
-  color: "#9ca3af",
+  color: isDark ? "#9ca3af" : "#475569",
   margin: 0,
   lineHeight: "1.5",
-};
+});
 
 export default AdminDashboard;
+

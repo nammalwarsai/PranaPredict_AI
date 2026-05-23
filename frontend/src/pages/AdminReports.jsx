@@ -169,8 +169,8 @@ function AdminReports() {
                     return (
                       <tr key={r.id} style={trStyle}>
                         <td style={tdStyle}>
-                          <div style={{ fontWeight: "600", color: "#fff" }}>{r.userFullName || "Unknown"}</div>
-                          <div style={{ fontSize: "11px", color: "#6b7280" }}>{r.userEmail}</div>
+                          <div style={{ fontWeight: "600", color: "var(--text)" }}>{r.userFullName || "Unknown"}</div>
+                          <div style={{ fontSize: "11px", color: "var(--text-light)" }}>{r.userEmail}</div>
                         </td>
                         <td style={tdStyle}>{r.age}</td>
                         <td style={tdStyle}>{r.bmi}</td>
@@ -263,7 +263,9 @@ function AdminReports() {
 const adminLayoutStyle = {
   display: "flex",
   minHeight: "100vh",
-  background: "var(--bg-dark, #0b0f19)",
+  background: "var(--bg)",
+  color: "var(--text)",
+  transition: "background 0.3s ease, color 0.3s ease",
 };
 
 const adminMainContentStyle = {
@@ -292,7 +294,7 @@ const labelStyle = {
 const headingStyle = {
   margin: "4px 0 0 0",
   fontSize: "28px",
-  color: "#fff",
+  color: "var(--text)",
   fontWeight: "700",
   fontFamily: "'Outfit', sans-serif",
 };
@@ -301,7 +303,7 @@ const exportBtnStyle = {
   padding: "10px 20px",
   borderRadius: "10px",
   background: "rgba(16, 185, 129, 0.12)",
-  border: "1px solid rgba(16, 185, 129, 0.25)",
+  border: "1.5px solid rgba(16, 185, 129, 0.25)",
   color: "#10b981",
   fontWeight: "600",
   fontSize: "13px",
@@ -320,17 +322,18 @@ const searchInputStyle = {
   flex: 1,
   padding: "10px 18px",
   borderRadius: "10px",
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255,255,255,0.06)",
-  color: "#fff",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
+  color: "var(--text)",
   fontSize: "14px",
   outline: "none",
   maxWidth: "480px",
+  transition: "all 0.3s ease",
 };
 
 const searchCountStyle = {
   fontSize: "13px",
-  color: "#6b7280",
+  color: "var(--text-light)",
   whiteSpace: "nowrap",
 };
 
@@ -353,9 +356,9 @@ const spinnerStyle = {
 };
 
 const errorCardStyle = {
-  background: "rgba(239, 68, 68, 0.08)",
-  border: "1px solid rgba(239, 68, 68, 0.15)",
-  color: "#fca5a5",
+  background: "var(--danger-light)",
+  border: "1.5px solid var(--border)",
+  color: "var(--danger)",
   padding: "24px",
   borderRadius: "12px",
   textAlign: "center",
@@ -373,9 +376,9 @@ const retryBtnStyle = {
 };
 
 const emptyCardStyle = {
-  background: "rgba(17, 24, 39, 0.3)",
-  border: "1px solid rgba(255,255,255,0.04)",
-  color: "#9ca3af",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
+  color: "var(--text-light)",
   padding: "48px",
   borderRadius: "12px",
   textAlign: "center",
@@ -383,11 +386,12 @@ const emptyCardStyle = {
 };
 
 const tableContainerStyle = {
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
   borderRadius: "16px",
   overflow: "auto",
-  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
+  boxShadow: "var(--shadow-md)",
+  transition: "all 0.3s ease",
 };
 
 const tableStyle = {
@@ -398,14 +402,14 @@ const tableStyle = {
 };
 
 const tableHeaderRowStyle = {
-  background: "rgba(255,255,255,0.02)",
-  borderBottom: "1px solid rgba(255,255,255,0.05)",
+  background: "var(--bg-subtle)",
+  borderBottom: "1.5px solid var(--border)",
 };
 
 const thStyle = {
   padding: "14px 18px",
   fontSize: "11px",
-  color: "#9ca3af",
+  color: "var(--text-secondary)",
   fontWeight: "700",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
@@ -413,13 +417,13 @@ const thStyle = {
 };
 
 const trStyle = {
-  borderBottom: "1px solid rgba(255,255,255,0.03)",
+  borderBottom: "1.5px solid var(--border)",
 };
 
 const tdStyle = {
   padding: "14px 18px",
   fontSize: "13px",
-  color: "#cbd5e1",
+  color: "var(--text)",
   verticalAlign: "middle",
 };
 
@@ -436,7 +440,7 @@ const pageBtnStyle = (disabled) => ({
   borderRadius: "8px",
   background: disabled ? "rgba(255,255,255,0.02)" : "rgba(16, 185, 129, 0.1)",
   border: disabled ? "1px solid rgba(255,255,255,0.04)" : "1px solid rgba(16, 185, 129, 0.2)",
-  color: disabled ? "#4b5563" : "#10b981",
+  color: disabled ? "var(--text-muted)" : "#10b981",
   fontWeight: "600",
   fontSize: "13px",
   cursor: disabled ? "not-allowed" : "pointer",

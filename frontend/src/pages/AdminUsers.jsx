@@ -440,7 +440,9 @@ function AdminUsers() {
 const adminLayoutStyle = {
   display: "flex",
   minHeight: "100vh",
-  background: "var(--bg-dark, #0b0f19)",
+  background: "var(--bg)",
+  color: "var(--text)",
+  transition: "background 0.3s ease, color 0.3s ease",
 };
 
 const adminMainContentStyle = {
@@ -478,11 +480,12 @@ const searchInputStyle = {
   flex: 1,
   padding: "10px 16px",
   borderRadius: "10px",
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255,255,255,0.06)",
-  color: "#fff",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
+  color: "var(--text)",
   fontSize: "14px",
   outline: "none",
+  transition: "all 0.3s ease",
 };
 
 const searchButtonStyle = {
@@ -504,10 +507,12 @@ const filterButtonsWrapStyle = {
 const filterBtnStyle = {
   padding: "8px 16px",
   borderRadius: "20px",
-  border: "1px solid rgba(255,255,255,0.06)",
+  border: "1.5px solid var(--border)",
   fontSize: "13px",
   fontWeight: "600",
   cursor: "pointer",
+  background: "transparent",
+  color: "var(--text-light)",
   transition: "all 0.2s ease",
 };
 
@@ -521,29 +526,30 @@ const spinnerStyle = {
 };
 
 const errorCardStyle = {
-  background: "rgba(239, 68, 68, 0.08)",
-  border: "1px solid rgba(239, 68, 68, 0.15)",
-  color: "#fca5a5",
+  background: "var(--danger-light)",
+  border: "1.5px solid var(--border)",
+  color: "var(--danger)",
   padding: "20px",
   borderRadius: "12px",
   textAlign: "center",
 };
 
 const emptyCardStyle = {
-  background: "rgba(17, 24, 39, 0.3)",
-  border: "1px solid rgba(255,255,255,0.04)",
-  color: "#9ca3af",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
+  color: "var(--text-light)",
   padding: "40px",
   borderRadius: "12px",
   textAlign: "center",
 };
 
 const tableContainerStyle = {
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
   borderRadius: "16px",
   overflow: "hidden",
-  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
+  boxShadow: "var(--shadow-md)",
+  transition: "all 0.3s ease",
 };
 
 const tableStyle = {
@@ -553,28 +559,28 @@ const tableStyle = {
 };
 
 const tableHeaderRowStyle = {
-  background: "rgba(255,255,255,0.02)",
-  borderBottom: "1px solid rgba(255,255,255,0.05)",
+  background: "var(--bg-subtle)",
+  borderBottom: "1.5px solid var(--border)",
 };
 
 const thStyle = {
   padding: "16px 24px",
   fontSize: "12px",
-  color: "#9ca3af",
+  color: "var(--text-secondary)",
   fontWeight: "600",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
 };
 
 const trStyle = {
-  borderBottom: "1px solid rgba(255,255,255,0.03)",
+  borderBottom: "1.5px solid var(--border)",
   transition: "background 0.2s ease",
 };
 
 const tdStyle = {
   padding: "18px 24px",
   fontSize: "14px",
-  color: "#e2e8f0",
+  color: "var(--text)",
   verticalAlign: "middle",
 };
 
@@ -593,7 +599,7 @@ const overlayStyle = {
   left: 0,
   width: "100vw",
   height: "100vh",
-  background: "rgba(3, 7, 18, 0.7)",
+  background: "rgba(3, 7, 18, 0.65)",
   backdropFilter: "blur(4px)",
   display: "flex",
   alignItems: "center",
@@ -601,9 +607,9 @@ const overlayStyle = {
   zIndex: 1000,
 };
 
-const slideoutContainerStyle = {
-  background: "#0f172a",
-  borderLeft: "1px solid rgba(16, 185, 129, 0.15)",
+const slideoutContainerStyle = (isDark) => ({
+  background: isDark ? "#0f172a" : "#ffffff",
+  borderLeft: `1px solid ${isDark ? "rgba(16, 185, 129, 0.2)" : "rgba(16, 185, 129, 0.35)"}`,
   width: "550px",
   maxWidth: "100%",
   height: "100vh",
@@ -612,9 +618,9 @@ const slideoutContainerStyle = {
   top: 0,
   display: "flex",
   flexDirection: "column",
-  boxShadow: "-10px 0 40px rgba(0,0,0,0.5)",
+  boxShadow: "-10px 0 40px rgba(0,0,0,0.3)",
   animation: "slideIn 0.3s ease-out forwards",
-};
+});
 
 const closeSlideoutBtnStyle = {
   position: "absolute",
@@ -622,16 +628,16 @@ const closeSlideoutBtnStyle = {
   right: "20px",
   background: "none",
   border: "none",
-  color: "#9ca3af",
+  color: "var(--text-light)",
   fontSize: "28px",
   cursor: "pointer",
 };
 
-const slideoutHeaderStyle = {
+const slideoutHeaderStyle = (isDark) => ({
   padding: "32px",
-  background: "rgba(17, 24, 39, 0.5)",
-  borderBottom: "1px solid rgba(255,255,255,0.05)",
-};
+  background: isDark ? "rgba(17, 24, 39, 0.5)" : "var(--bg-subtle)",
+  borderBottom: "1.5px solid var(--border)",
+});
 
 const slideoutAvatarStyle = {
   width: "48px",
@@ -652,22 +658,22 @@ const slideoutContentStyle = {
   overflowY: "auto",
 };
 
-const timelineStackStyle = {
+const timelineStackStyle = (isDark) => ({
   display: "flex",
   flexDirection: "column",
   gap: "20px",
-  borderLeft: "2px solid rgba(255,255,255,0.05)",
+  borderLeft: `2px solid ${isDark ? "rgba(255,255,255,0.06)" : "var(--border)"}`,
   paddingLeft: "20px",
   marginLeft: "8px",
-};
+});
 
-const timelineCardStyle = {
-  background: "rgba(17, 24, 39, 0.4)",
-  border: "1px solid rgba(255,255,255,0.03)",
+const timelineCardStyle = (isDark) => ({
+  background: isDark ? "rgba(17, 24, 39, 0.4)" : "var(--bg-subtle)",
+  border: `1.5px solid ${isDark ? "rgba(255,255,255,0.03)" : "var(--border)"}`,
   borderRadius: "12px",
   padding: "20px",
   position: "relative",
-};
+});
 
 const timelineDotStyle = (isHigh) => ({
   width: "12px",
@@ -677,7 +683,7 @@ const timelineDotStyle = (isHigh) => ({
   position: "absolute",
   left: "-27px",
   top: "24px",
-  border: "2px solid #0f172a",
+  border: "2px solid var(--card-bg)",
   boxShadow: isHigh ? "0 0 10px rgba(239, 68, 68, 0.4)" : "0 0 10px rgba(16, 185, 129, 0.4)",
 });
 
@@ -688,16 +694,16 @@ const timelineHeaderStyle = {
   marginBottom: "12px",
 };
 
-const timelineGridStyle = {
+const timelineGridStyle = (isDark) => ({
   display: "grid",
   gridTemplateColumns: "repeat(4, 1fr)",
   gap: "10px",
-  background: "rgba(255,255,255,0.02)",
+  background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0, 0, 0, 0.03)",
   borderRadius: "8px",
   padding: "10px",
   fontSize: "12px",
-  color: "#94a3b8",
-};
+  color: "var(--text-light)",
+});
 
 const paramItemStyle = {
   whiteSpace: "nowrap",
@@ -705,27 +711,27 @@ const paramItemStyle = {
   textOverflow: "ellipsis",
 };
 
-const adviceSnippetStyle = {
+const adviceSnippetStyle = (isDark) => ({
   marginTop: "12px",
   padding: "12px",
-  background: "rgba(16, 185, 129, 0.05)",
+  background: isDark ? "rgba(16, 185, 129, 0.05)" : "rgba(16, 185, 129, 0.03)",
   borderRadius: "8px",
-  borderLeft: "2px solid #10b981",
+  borderLeft: "2.5px solid #10b981",
   fontSize: "13px",
-  color: "#fff",
-};
+  color: "var(--text)",
+});
 
-const errorBoxStyle = {
-  background: "rgba(239, 68, 68, 0.08)",
-  border: "1px solid rgba(239, 68, 68, 0.2)",
+const errorBoxStyle = (isDark) => ({
+  background: isDark ? "rgba(239, 68, 68, 0.08)" : "rgba(239, 68, 68, 0.05)",
+  border: `1.5px solid ${isDark ? "rgba(239, 68, 68, 0.2)" : "rgba(239, 68, 68, 0.15)"}`,
   padding: "32px",
   borderRadius: "16px",
   maxWidth: "500px",
   width: "100%",
   textAlign: "center",
   fontFamily: "Inter, sans-serif",
-  color: "#fff",
-};
+  color: "var(--text)",
+});
 
 const retryButtonStyle = {
   marginTop: "16px",
@@ -739,3 +745,4 @@ const retryButtonStyle = {
 };
 
 export default AdminUsers;
+

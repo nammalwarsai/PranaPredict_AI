@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAdminStats } from "../api/api";
 import AdminSidebar from "../components/AdminSidebar";
+import { useTheme } from "../context/ThemeContext";
 import { Doughnut, Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -19,6 +20,8 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Le
  * Advanced analytics center visualizing disease prediction frequency, lifestyle risk mappings, and parameters ratios.
  */
 function AdminAnalytics() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -100,8 +103,8 @@ function AdminAnalytics() {
       tooltip: { cornerRadius: 8, padding: 12 },
     },
     scales: {
-      y: { grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#94a3b8" } },
-      x: { grid: { display: false }, ticks: { color: "#94a3b8" } },
+      y: { grid: { color: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }, ticks: { color: isDark ? "#94a3b8" : "#475569" } },
+      x: { grid: { display: false }, ticks: { color: isDark ? "#94a3b8" : "#475569" } },
     },
   };
 
@@ -125,7 +128,7 @@ function AdminAnalytics() {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: "bottom", labels: { color: "#e2e8f0", padding: 12, usePointStyle: true } },
+      legend: { position: "bottom", labels: { color: isDark ? "#e2e8f0" : "#1f2937", padding: 12, usePointStyle: true } },
     },
   };
 
@@ -149,8 +152,8 @@ function AdminAnalytics() {
       legend: { display: false },
     },
     scales: {
-      y: { grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#94a3b8" } },
-      x: { grid: { display: false }, ticks: { color: "#94a3b8" } },
+      y: { grid: { color: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }, ticks: { color: isDark ? "#94a3b8" : "#475569" } },
+      x: { grid: { display: false }, ticks: { color: isDark ? "#94a3b8" : "#475569" } },
     },
   };
 
@@ -176,8 +179,8 @@ function AdminAnalytics() {
       legend: { display: false },
     },
     scales: {
-      y: { grid: { color: "rgba(255,255,255,0.06)" }, ticks: { color: "#94a3b8" } },
-      x: { grid: { display: false }, ticks: { color: "#94a3b8" } },
+      y: { grid: { color: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }, ticks: { color: isDark ? "#94a3b8" : "#475569" } },
+      x: { grid: { display: false }, ticks: { color: isDark ? "#94a3b8" : "#475569" } },
     },
   };
 
@@ -192,7 +195,7 @@ function AdminAnalytics() {
             <span style={{ fontSize: "12px", color: "#10b981", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase" }}>
               Analytics Core
             </span>
-            <h1 style={{ margin: "4px 0 0 0", fontSize: "28px", color: "#fff", fontWeight: "700", fontFamily: "'Outfit', sans-serif" }}>
+            <h1 style={{ margin: "4px 0 0 0", fontSize: "28px", color: isDark ? "#fff" : "#0f172a", fontWeight: "700", fontFamily: "'Outfit', sans-serif", transition: "color 0.3s ease" }}>
               Health Analytics
             </h1>
           </div>
@@ -262,10 +265,10 @@ function AdminAnalytics() {
 
         {/* Lifestyle Risk heat ratios mapping */}
         <section style={heatmapSectionStyle}>
-          <h3 style={{ fontSize: "16px", color: "#fff", margin: "0 0 16px 0", fontWeight: "600" }}>
+          <h3 style={{ fontSize: "16px", color: isDark ? "#fff" : "#0f172a", margin: "0 0 16px 0", fontWeight: "600", transition: "color 0.3s ease" }}>
             🥗 Lifestyle & Activity Risk Matrix
           </h3>
-          <p style={{ color: "#9ca3af", fontSize: "13px", margin: "0 0 20px 0", lineHeight: "1.5" }}>
+          <p style={{ color: isDark ? "#9ca3af" : "#475569", fontSize: "13px", margin: "0 0 20px 0", lineHeight: "1.5" }}>
             The table below aggregates the mean AI-calculated risk index grouped by dietary lifestyle and physical activity levels.
           </p>
 
@@ -324,7 +327,9 @@ function AdminAnalytics() {
 const adminLayoutStyle = {
   display: "flex",
   minHeight: "100vh",
-  background: "var(--bg-dark, #0b0f19)",
+  background: "var(--bg)",
+  color: "var(--text)",
+  transition: "background 0.3s ease, color 0.3s ease",
 };
 
 const adminContentLoadingStyle = {
@@ -345,15 +350,15 @@ const adminContentErrorStyle = {
 };
 
 const errorBoxStyle = {
-  background: "rgba(239, 68, 68, 0.08)",
-  border: "1px solid rgba(239, 68, 68, 0.2)",
+  background: "var(--danger-light)",
+  border: "1.5px solid var(--border)",
   padding: "32px",
   borderRadius: "16px",
   maxWidth: "500px",
   width: "100%",
   textAlign: "center",
   fontFamily: "Inter, sans-serif",
-  color: "#fff",
+  color: "var(--text)",
 };
 
 const retryButtonStyle = {
@@ -398,15 +403,16 @@ const filterBarWrapStyle = {
   alignItems: "center",
   gap: "20px",
   flexWrap: "wrap",
-  background: "rgba(17, 24, 39, 0.4)",
-  border: "1px solid rgba(255, 255, 255, 0.03)",
+  background: "var(--bg-subtle)",
+  border: "1.5px solid var(--border)",
   borderRadius: "12px",
   padding: "16px 24px",
   marginBottom: "28px",
+  transition: "all 0.3s ease",
 };
 
 const filterLabelStyle = {
-  color: "#9ca3af",
+  color: "var(--text-light)",
   fontSize: "13px",
   fontWeight: "500",
 };
@@ -416,18 +422,19 @@ const selectWrapStyle = {
   alignItems: "center",
   gap: "8px",
   fontSize: "13px",
-  color: "#e2e8f0",
+  color: "var(--text)",
 };
 
 const selectStyle = {
-  background: "rgba(17, 24, 39, 0.8)",
-  border: "1px solid rgba(255,255,255,0.08)",
-  color: "#fff",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
+  color: "var(--text)",
   borderRadius: "8px",
   padding: "6px 12px",
   fontSize: "13px",
   outline: "none",
   cursor: "pointer",
+  transition: "all 0.3s ease",
 };
 
 const analyticsGridStyle = {
@@ -438,18 +445,19 @@ const analyticsGridStyle = {
 };
 
 const chartCardStyle = {
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
   borderRadius: "16px",
   padding: "24px",
-  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
+  boxShadow: "var(--shadow-md)",
   display: "flex",
   flexDirection: "column",
+  transition: "all 0.3s ease",
 };
 
 const chartTitleStyle = {
   fontSize: "15px",
-  color: "#fff",
+  color: "var(--text)",
   margin: "0 0 20px 0",
   fontWeight: "600",
 };
@@ -461,18 +469,20 @@ const chartWrapStyle = {
 };
 
 const heatmapSectionStyle = {
-  background: "rgba(17, 24, 39, 0.4)",
-  border: "1px solid rgba(255, 255, 255, 0.03)",
+  background: "var(--card-bg)",
+  border: "1.5px solid var(--border)",
   borderRadius: "16px",
   padding: "28px",
-  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+  boxShadow: "var(--shadow-md)",
+  transition: "all 0.3s ease",
 };
 
 const tableContainerStyle = {
-  background: "rgba(17, 24, 39, 0.65)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
+  background: "var(--bg-subtle)",
+  border: "1.5px solid var(--border)",
   borderRadius: "12px",
   overflow: "hidden",
+  transition: "all 0.3s ease",
 };
 
 const tableStyle = {
@@ -482,27 +492,27 @@ const tableStyle = {
 };
 
 const tableHeaderRowStyle = {
-  background: "rgba(255,255,255,0.02)",
-  borderBottom: "1px solid rgba(255,255,255,0.05)",
+  background: "var(--bg-subtle)",
+  borderBottom: "1.5px solid var(--border)",
 };
 
 const thStyle = {
   padding: "14px 20px",
   fontSize: "12px",
-  color: "#9ca3af",
+  color: "var(--text-secondary)",
   fontWeight: "600",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
 };
 
 const trStyle = {
-  borderBottom: "1px solid rgba(255,255,255,0.03)",
+  borderBottom: "1.5px solid var(--border)",
 };
 
 const tdStyle = {
   padding: "16px 20px",
   fontSize: "14px",
-  color: "#cbd5e1",
+  color: "var(--text)",
 };
 
 export default AdminAnalytics;

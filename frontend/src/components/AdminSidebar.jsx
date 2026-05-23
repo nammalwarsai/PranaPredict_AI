@@ -1,12 +1,15 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useTheme } from "../context/ThemeContext";
 
 /**
  * Reusable sidebar navigation for the admin panel views.
  */
 function AdminSidebar() {
   const { signOut, profile } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const isDark = theme === "dark";
 
   const handleLogout = async () => {
     try {
@@ -17,26 +20,39 @@ function AdminSidebar() {
     }
   };
 
+  const colors = {
+    sidebarBg: isDark ? "linear-gradient(180deg, #090d16 0%, #111827 100%)" : "linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)",
+    sidebarBorder: isDark ? "rgba(16, 185, 129, 0.12)" : "rgba(16, 185, 129, 0.2)",
+    divider: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)",
+    headerText: isDark ? "#fff" : "#0f172a",
+    subText: isDark ? "#10b981" : "#059669",
+    avatarBg: isDark ? "linear-gradient(135deg, #10b981, #06b6d4)" : "linear-gradient(135deg, #059669, #0891b2)",
+    toggleBtnBg: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+    toggleBtnBorder: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+    toggleBtnText: isDark ? "#9ca3af" : "#475569",
+  };
+
   return (
     <aside className="admin-sidebar" style={{
       width: "260px",
-      background: "linear-gradient(180deg, #090d16 0%, #111827 100%)",
-      borderRight: "1px solid rgba(16, 185, 129, 0.12)",
+      background: colors.sidebarBg,
+      borderRight: `1px solid ${colors.sidebarBorder}`,
       display: "flex",
       flexDirection: "column",
       height: "calc(100vh - 64px)", // subtract navbar height
       position: "sticky",
       top: "64px",
-      fontFamily: "'Outfit', 'Inter', sans-serif"
+      fontFamily: "'Outfit', 'Inter', sans-serif",
+      transition: "background 0.3s ease, border-color 0.3s ease"
     }}>
       {/* Header Info */}
-      <div style={{ padding: "24px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+      <div style={{ padding: "24px 20px", borderBottom: `1px solid ${colors.divider}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{
             width: "38px",
             height: "38px",
             borderRadius: "10px",
-            background: "linear-gradient(135deg, #10b981, #06b6d4)",
+            background: colors.avatarBg,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -47,10 +63,10 @@ function AdminSidebar() {
             {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "A"}
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: "14px", color: "#fff", fontWeight: "600" }}>
+            <h4 style={{ margin: 0, fontSize: "14px", color: colors.headerText, fontWeight: "600", transition: "color 0.3s ease" }}>
               {profile?.full_name || "Administrator"}
             </h4>
-            <span style={{ fontSize: "12px", color: "#10b981", fontWeight: "500", letterSpacing: "0.5px" }}>
+            <span style={{ fontSize: "12px", color: colors.subText, fontWeight: "500", letterSpacing: "0.5px", transition: "color 0.3s ease" }}>
               SYSTEM SECURE
             </span>
           </div>
@@ -96,8 +112,38 @@ function AdminSidebar() {
         </NavLink>
       </nav>
 
-      {/* Footer / Exit */}
-      <div style={{ padding: "20px 16px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+      {/* Footer / Theme Toggle / Exit */}
+      <div style={{ padding: "20px 16px", borderTop: `1px solid ${colors.divider}`, display: "flex", flexDirection: "column", gap: "12px" }}>
+        
+        {/* Sidebar Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          style={{
+            width: "100%",
+            padding: "10px 12px",
+            borderRadius: "10px",
+            background: colors.toggleBtnBg,
+            border: `1px solid ${colors.toggleBtnBorder}`,
+            color: colors.toggleBtnText,
+            fontSize: "13px",
+            fontWeight: "600",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            transition: "all 0.2s ease"
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = colors.toggleBtnBg;
+          }}
+        >
+          <span>{isDark ? "☀️ Light Mode" : "🌙 Dark Mode"}</span>
+        </button>
+
         <button
           onClick={handleLogout}
           style={{
@@ -137,18 +183,18 @@ function AdminSidebar() {
           gap: 12px;
           padding: 12px 16px;
           border-radius: 10px;
-          color: #9ca3af;
+          color: ${isDark ? "#9ca3af" : "#475569"};
           text-decoration: none;
           font-size: 14px;
           font-weight: 500;
           transition: all 0.2s ease;
         }
         .admin-nav-link:hover {
-          background: rgba(16, 185, 129, 0.06);
+          background: ${isDark ? "rgba(16, 185, 129, 0.06)" : "rgba(16, 185, 129, 0.05)"};
           color: #10b981;
         }
         .admin-nav-link.active {
-          background: rgba(16, 185, 129, 0.12);
+          background: ${isDark ? "rgba(16, 185, 129, 0.12)" : "rgba(16, 185, 129, 0.08)"};
           color: #10b981;
           font-weight: 600;
           box-shadow: inset 3px 0 0 #10b981;
@@ -163,3 +209,4 @@ const navLinkStyle = {
 };
 
 export default AdminSidebar;
+
