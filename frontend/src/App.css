@@ -1,8 +1,3 @@
-/* ============================================================
-   PranaPredict AI — Modern UI Stylesheet
-   ============================================================ */
-
-/* === Reset & Global Styles === */
 *,
 *::before,
 *::after {
@@ -10,6 +5,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 
 :root {
   /* Color palette */
@@ -59,9 +55,6 @@
   --transition-slow: 300ms ease;
 }
 
-/* ============================
-   DARK MODE OVERRIDES
-   ============================ */
 [data-theme="dark"] {
   --primary: #3b82f6;
   --primary-dark: #2563eb;
@@ -95,7 +88,7 @@
     linear-gradient(180deg, #0b1224 0%, #111827 100%);
 }
 
-/* --- Dark mode component overrides --- */
+
 [data-theme="dark"] .navbar {
   background: rgba(15, 23, 42, 0.92);
   border-color: var(--border);
@@ -195,7 +188,7 @@
   box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
 }
 
-/* === Theme Toggle Button === */
+
 .theme-toggle {
   display: inline-flex;
   align-items: center;

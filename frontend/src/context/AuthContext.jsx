@@ -1,8 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useCallback, useMemo } from "react";
 import supabase from "../config/supabaseClient";
 
-// Exported separately so the useAuth hook file can import it
-// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -185,9 +184,6 @@ export function AuthProvider({ children }) {
     setProfile(optimisticProfile);
 
     try {
-      // 3. Background DB Update: use .update() instead of .upsert() since the 
-      // row is guaranteed to exist via the DB trigger. This is faster and avoids
-      // constraint evaluation hangs.
       const { data, error } = await supabase
         .from("profiles")
         .update({

@@ -13,19 +13,15 @@ import Profile from "./pages/Profile";
 import Report from "./pages/Report";
 import HealthTips from "./pages/HealthTips";
 import Analytics from "./pages/Analytics";
-
-// Admin Panel Imports
 import AdminRoute from "./components/AdminRoute";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminReports from "./pages/AdminReports";
-
 import "./App.css";
 import "./styles/design-system.css";
 
-// Layout for standard client-facing pages
 function ClientLayout() {
   return (
     <div className="app">
@@ -38,7 +34,6 @@ function ClientLayout() {
   );
 }
 
-// Layout for full-width admin portal pages
 function AdminLayoutWrapper() {
   return (
     <div className="app">
@@ -55,7 +50,6 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <Routes>
-            {/* Standard Client Pages */}
             <Route element={<ClientLayout />}>
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
@@ -68,7 +62,6 @@ function App() {
               <Route path="/health-tips" element={<ProtectedRoute><HealthTips /></ProtectedRoute>} />
             </Route>
 
-            {/* Admin Portal Pages */}
             <Route element={<AdminLayoutWrapper />}>
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
@@ -83,5 +76,6 @@ function App() {
   );
 }
 
-export default App;
 
+
+export default App;

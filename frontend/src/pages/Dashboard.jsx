@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from "react";
+import { useState, useCallback } from "react";
 import HealthForm from "../components/HealthForm";
 import RiskResult from "../components/RiskResult";
 import { submitPrediction } from "../api/api";

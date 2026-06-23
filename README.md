@@ -8,3 +8,16 @@ Report and email modules generate and share health summaries.
 Core user screens include Dashboard, History, Profile, and Report.
 APIs are structured with routes, controllers, services, and middleware.
 Frontend and backend each have separate package and env configuration.
+
+
+
+
+
+
+
+
+
+
+
+
+

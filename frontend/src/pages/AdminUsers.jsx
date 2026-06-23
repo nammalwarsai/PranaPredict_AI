@@ -369,7 +369,7 @@ function AdminUsers() {
                   <p style={{ color: "#6b7280", fontSize: "14px" }}>This user hasn't completed any health risk assessments yet.</p>
                 ) : (
                   <div style={timelineStackStyle}>
-                    {selectedUser.reports.map((report, idx) => {
+                    {selectedUser.reports.map((report) => {
                       const date = new Date(report.created_at).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",

@@ -22,6 +22,7 @@ function buildPrompt(healthData, riskResult) {
 
   return `You are PranaPredict AI, a health wellness advisor combining modern preventive medicine with Ayurvedic wisdom. Generate a structured health report for the following patient data.
 
+  
 PATIENT HEALTH DATA:
 - Age: ${age}
 - BMI: ${bmi}
