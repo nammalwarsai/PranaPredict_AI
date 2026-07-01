@@ -328,6 +328,7 @@ function getBracket(age) {
   if (age >= 36 && age <= 50) return "36-50";
   if (age >= 51 && age <= 65) return "51-65";
   if (age >= 66 && age <= 100) return "66-100";
+  
   return null;
 }
 
@@ -353,7 +354,6 @@ function HealthTips() {
 
   return (
     <div className="ht-page">
-      {/* Header */}
       <div className="ht-header">
         <div className="ht-header-chip">AI + Ayurveda Personalised Engine</div>
         <span className="ht-header-icon">🌿</span>
