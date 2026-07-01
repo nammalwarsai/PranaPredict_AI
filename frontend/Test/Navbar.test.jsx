@@ -3,9 +3,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 
 // Mock modules with inline factory functions (to avoid hoisting issues)
-vi.mock("../src/hooks/useAuth", () => ({
-  default: vi.fn(),
-}));
+vi.mock("../src/hooks/useAuth", () => {
+  const fn = vi.fn();
+  return { default: fn, useAuth: fn };
+});
 
 vi.mock("../src/context/ThemeContext", () => ({
   useTheme: vi.fn(),
@@ -138,7 +139,7 @@ describe("Navbar Component", () => {
       const burgerButton = screen.getByRole("button", { name: /Open menu/i });
 
       // Menu should be initially closed
-      const navLinks = screen.getByRole("navigation");
+      const navLinks = screen.getByRole("navigation", { name: "Primary" });
       expect(navLinks.className).not.toContain("--open");
 
       // Open menu
@@ -168,7 +169,7 @@ describe("Navbar Component", () => {
 
       // Open menu
       fireEvent.click(burgerButton);
-      const navLinks = screen.getByRole("navigation");
+      const navLinks = screen.getByRole("navigation", { name: "Primary" });
       expect(navLinks.className).toContain("--open");
 
       // Press Escape
@@ -193,7 +194,7 @@ describe("Navbar Component", () => {
       const burgerButton = screen.getByRole("button", { name: /Open menu/i });
       fireEvent.click(burgerButton);
 
-      const navLinks = screen.getByRole("navigation");
+      const navLinks = screen.getByRole("navigation", { name: "Primary" });
       expect(navLinks.className).toContain("--open");
 
       // Press other keys

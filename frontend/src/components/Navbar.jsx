@@ -50,7 +50,6 @@ function Navbar() {
 
   // Close menu on Escape key
   useEffect(() => {
-    if (!menuOpen) return;
     const handleEscape = (e) => {
       if (e.key === "Escape" && menuOpen) closeMenu();
     };
@@ -61,7 +60,9 @@ function Navbar() {
   const handleSignOut = async () => {
     closeMenu();
     // Send logout email before signing out (needs auth token)
-    sendLogoutNotification().catch(() => {});
+    sendLogoutNotification().catch((err) => {
+      console.error(err);
+    });
     await signOut();
     navigate("/login", { replace: true });
   };

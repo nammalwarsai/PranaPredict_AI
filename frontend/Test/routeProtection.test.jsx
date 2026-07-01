@@ -1,14 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../src/components/ProtectedRoute";
 import PublicRoute from "../src/components/PublicRoute";
 import AdminRoute from "../src/components/AdminRoute";
 
 // Mock useAuth hook
-vi.mock("../src/hooks/useAuth", () => ({
-  default: vi.fn(),
-}));
+vi.mock("../src/hooks/useAuth", () => {
+  const fn = vi.fn();
+  return { default: fn, useAuth: fn };
+});
 
 import useAuth from "../src/hooks/useAuth";
 
@@ -22,11 +23,11 @@ describe("Route Protection Components", () => {
       useAuth.mockReturnValue({ user: null, loading: true, profile: null });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <ProtectedRoute>
             <div>Protected Content</div>
           </ProtectedRoute>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -37,7 +38,7 @@ describe("Route Protection Components", () => {
       useAuth.mockReturnValue({ user: null, loading: false, profile: null });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <Routes>
             <Route
               path="/"
@@ -49,7 +50,7 @@ describe("Route Protection Components", () => {
             />
             <Route path="/login" element={<div>Login Page</div>} />
           </Routes>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Login Page")).toBeInTheDocument();
@@ -64,11 +65,11 @@ describe("Route Protection Components", () => {
       });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <ProtectedRoute>
             <div>Protected Content</div>
           </ProtectedRoute>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Protected Content")).toBeInTheDocument();
@@ -80,11 +81,11 @@ describe("Route Protection Components", () => {
       useAuth.mockReturnValue({ user: null, loading: true, profile: null });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <PublicRoute>
             <div>Public Content</div>
           </PublicRoute>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Loading...")).toBeInTheDocument();
@@ -99,7 +100,7 @@ describe("Route Protection Components", () => {
       });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <Routes>
             <Route
               path="/"
@@ -111,7 +112,7 @@ describe("Route Protection Components", () => {
             />
             <Route path="/dashboard" element={<div>Dashboard Page</div>} />
           </Routes>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Dashboard Page")).toBeInTheDocument();
@@ -122,11 +123,11 @@ describe("Route Protection Components", () => {
       useAuth.mockReturnValue({ user: null, loading: false, profile: null });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <PublicRoute>
             <div>Public Content</div>
           </PublicRoute>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Public Content")).toBeInTheDocument();
@@ -138,11 +139,11 @@ describe("Route Protection Components", () => {
       useAuth.mockReturnValue({ user: null, loading: true, profile: null });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <AdminRoute>
             <div>Admin Content</div>
           </AdminRoute>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Loading administrative console...")).toBeInTheDocument();
@@ -153,7 +154,7 @@ describe("Route Protection Components", () => {
       useAuth.mockReturnValue({ user: null, loading: false, profile: null });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <Routes>
             <Route
               path="/"
@@ -165,7 +166,7 @@ describe("Route Protection Components", () => {
             />
             <Route path="/admin/login" element={<div>Admin Login Page</div>} />
           </Routes>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Admin Login Page")).toBeInTheDocument();
@@ -180,7 +181,7 @@ describe("Route Protection Components", () => {
       });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <Routes>
             <Route
               path="/"
@@ -192,7 +193,7 @@ describe("Route Protection Components", () => {
             />
             <Route path="/dashboard" element={<div>User Dashboard</div>} />
           </Routes>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("User Dashboard")).toBeInTheDocument();
@@ -207,7 +208,7 @@ describe("Route Protection Components", () => {
       });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <Routes>
             <Route
               path="/"
@@ -219,7 +220,7 @@ describe("Route Protection Components", () => {
             />
             <Route path="/dashboard" element={<div>User Dashboard</div>} />
           </Routes>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("User Dashboard")).toBeInTheDocument();
@@ -234,11 +235,11 @@ describe("Route Protection Components", () => {
       });
 
       render(
-        <BrowserRouter>
+        <MemoryRouter>
           <AdminRoute>
             <div>Admin Content</div>
           </AdminRoute>
-        </BrowserRouter>
+        </MemoryRouter>
       );
 
       expect(screen.getByText("Admin Content")).toBeInTheDocument();

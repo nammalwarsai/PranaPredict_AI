@@ -188,7 +188,7 @@ function TrendCharts({ reports }) {
             {latestScore}
             {trend && (
               <span className="trend-indicator" style={{ color: trend.color }}>
-                {" "}{trend.icon} {trend.diff}
+                {" "}<span>{trend.icon}</span> <span>{trend.diff}</span>
               </span>
             )}
           </span>

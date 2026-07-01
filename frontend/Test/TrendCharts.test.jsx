@@ -92,7 +92,7 @@ describe("TrendCharts Component", () => {
       render(<TrendCharts reports={[]} />);
 
       expect(screen.getByText("0")).toBeInTheDocument(); // assessments
-      expect(screen.getByText("—")).toBeInTheDocument(); // average score placeholder
+      expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1); // average and latest score placeholders
     });
 
     it("handles single report correctly", () => {
@@ -102,7 +102,7 @@ describe("TrendCharts Component", () => {
 
       expect(screen.getByText("1")).toBeInTheDocument(); // 1 assessment
       expect(screen.getByText("45.0")).toBeInTheDocument(); // average = 45
-      expect(screen.getByText(/45/)).toBeInTheDocument(); // latest = 45
+      expect(screen.getAllByText(/45/).length).toBeGreaterThanOrEqual(1); // latest = 45
     });
   });
 

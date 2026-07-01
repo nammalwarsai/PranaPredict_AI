@@ -14,7 +14,7 @@ function normalizeValue(report, field) {
   }
 
   if (field.type === "bpSystolic") {
-    if (typeof raw !== "string") return null;
+    if (typeof raw !== "string" || !raw) return null;
     const systolic = Number(raw.split("/")[0]);
     return Number.isFinite(systolic) ? systolic : null;
   }
@@ -25,6 +25,7 @@ function normalizeValue(report, field) {
 }
 
 function formatLabel(dateText) {
+  if (dateText == null) return "Unknown";
   const d = new Date(dateText);
   return Number.isNaN(d.getTime())
     ? "Unknown"

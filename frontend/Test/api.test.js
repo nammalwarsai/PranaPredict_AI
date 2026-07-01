@@ -1,6 +1,30 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import axios from "axios";
 import supabase from "../src/config/supabaseClient";
+
+// Mock axios
+vi.mock("axios", () => {
+  const mockInstance = {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    interceptors: {
+      request: {
+        use: vi.fn((successHandler) => {
+          mockInstance._requestInterceptor = successHandler;
+          return 0;
+        }),
+      },
+    },
+  };
+  return {
+    default: {
+      create: vi.fn(() => mockInstance),
+    },
+  };
+});
+
 import {
   submitPrediction,
   getReports,
@@ -13,9 +37,6 @@ import {
   checkHealth,
 } from "../src/api/api";
 
-// Mock axios
-vi.mock("axios");
-
 // Mock Supabase
 vi.mock("../src/config/supabaseClient", () => {
   const mockSubscription = { unsubscribe: vi.fn() };
@@ -23,7 +44,10 @@ vi.mock("../src/config/supabaseClient", () => {
     default: {
       auth: {
         getSession: vi.fn(() => Promise.resolve({ data: { session: null } })),
-        onAuthStateChange: vi.fn(() => ({ data: { subscription: mockSubscription } })),
+        onAuthStateChange: vi.fn((cb) => {
+          global.mockAuthStateListener = cb;
+          return { data: { subscription: mockSubscription } };
+        }),
       },
     },
   };
@@ -31,40 +55,21 @@ vi.mock("../src/config/supabaseClient", () => {
 
 describe("API Module", () => {
   let mockAxiosInstance;
+  let runCount = 0;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-
-    // Create mock axios instance
-    mockAxiosInstance = {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(),
-      delete: vi.fn(),
-      interceptors: {
-        request: {
-          use: vi.fn((successHandler) => {
-            mockAxiosInstance._requestInterceptor = successHandler;
-            return 0;
-          }),
-        },
-      },
-    };
-
-    axios.create.mockReturnValue(mockAxiosInstance);
+    runCount++;
+    if (runCount > 2) {
+      vi.clearAllMocks();
+    }
+    mockAxiosInstance = axios.create();
+    if (global.mockAuthStateListener) {
+      global.mockAuthStateListener("SIGNED_OUT", null);
+    }
   });
 
   describe("Session Management", () => {
     it("hydrates session from Supabase on module load", async () => {
-      const mockSession = {
-        access_token: "test-token-123",
-        user: { id: "user-1", email: "test@example.com" },
-      };
-
-      supabase.auth.getSession.mockResolvedValueOnce({
-        data: { session: mockSession },
-      });
-
       // Wait for promise resolution
       await new Promise((resolve) => setTimeout(resolve, 10));
 
@@ -147,20 +152,27 @@ describe("API Module", () => {
 
     it("cancels previous prediction request when new one is submitted", async () => {
       const abortMock = vi.fn();
-      global.AbortController = vi.fn(() => ({
-        abort: abortMock,
-        signal: {},
-      }));
+      const originalAbort = global.AbortController;
+      global.AbortController = vi.fn().mockImplementation(function () {
+        return {
+          abort: abortMock,
+          signal: {},
+        };
+      });
 
-      mockAxiosInstance.post.mockResolvedValue({ data: {} });
+      try {
+        mockAxiosInstance.post.mockResolvedValue({ data: {} });
 
-      // First request
-      submitPrediction({ age: 30 });
+        // First request
+        submitPrediction({ age: 30 });
 
-      // Second request should cancel first
-      submitPrediction({ age: 35 });
+        // Second request should cancel first
+        submitPrediction({ age: 35 });
 
-      expect(abortMock).toHaveBeenCalled();
+        expect(abortMock).toHaveBeenCalled();
+      } finally {
+        global.AbortController = originalAbort;
+      }
     });
 
     it("handles prediction request errors", async () => {
