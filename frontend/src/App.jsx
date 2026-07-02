@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Outlet, Suspense, lazy } from "react-router-dom";
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
