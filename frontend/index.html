@@ -6,13 +6,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="PranaPredict AI delivers AI-powered preventive health risk assessments with personalized wellness guidance." />
     <meta name="theme-color" content="#1a4d7f" />
+    <meta name="keywords" content="health, AI, prediction, wellness, preventive, risk assessment" />
+    <meta name="author" content="PranaPredict AI" />
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="PranaPredict AI - Health Risk Predictor" />
+    <meta property="og:description" content="AI-powered preventive health risk assessments with personalized wellness guidance." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://pranapredict-ai.vercel.app" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PranaPredict AI - Health Risk Predictor" />
+    <meta name="twitter:description" content="AI-powered preventive health risk assessments with personalized wellness guidance." />
+    <meta name="twitter:image" content="/og-image.png" />
+    
+    <!-- Preconnect to external resources for better performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <title>PranaPredict AI — Health Risk Predictor</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    
+    <!-- Preload critical fonts -->
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" 
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="/src/styles/design-system.css" as="style" />
+    <link rel="preload" href="/src/App.css" as="style" />
+    
+    <!-- Preload critical JS -->
+    <link rel="modulepreload" href="/src/main.jsx" />
+    
+    <!-- Enable HTTP/2 Server Push -->
+    <link rel="preload" href="/src/context/AuthContext.jsx" as="script" />
+    <link rel="preload" href="/src/context/ThemeContext.jsx" as="script" />
+    
+    <!-- Accessibility: Prevent FOUC -->
+    <script>
+      // Add hydrated class to prevent FOUC
+      document.documentElement.classList.add('hydrated');
+      
+      // Set theme early to prevent flash
+      (function() {
+        const storedTheme = localStorage.getItem('prana-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "PranaPredict AI",
+      "description": "AI-powered preventive health risk assessments with personalized wellness guidance.",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    
+    <title>PranaPredict AI &mdash; Health Risk Predictor</title>
+    
+    <!-- Enable better caching -->
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000, immutable" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Load analytics or other non-critical scripts asynchronously -->
+    <script async defer>
+      // Non-critical JavaScript can be loaded here
+    </script>
   </body>
 </html>
